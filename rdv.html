@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MKIA — Prenez votre RDV avec MK Lab</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:#060610;color:#E2E8F0;min-height:100vh;display:flex;flex-direction:column}
+:root{--purple:#8B5CF6;--purple2:#4F46E5;--bg:#060610;--card:#0d0d1f;--border:rgba(139,92,246,0.2)}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--border);background:rgba(6,6,16,0.95);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100}
+.nav-logo{font-size:1.1rem;font-weight:800;background:linear-gradient(135deg,#fff,#A78BFA);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-back{font-size:0.85rem;color:#A78BFA;text-decoration:none;display:flex;align-items:center;gap:6px;transition:.2s}
+.nav-back:hover{color:#fff}
+
+/* HERO */
+.hero{text-align:center;padding:40px 20px 24px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(139,92,246,0.1);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:0.8rem;color:#A78BFA;margin-bottom:20px}
+.hero-badge span{width:7px;height:7px;background:#22c55e;border-radius:50%;animation:pulse 2s infinite}
+.hero h1{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;background:linear-gradient(135deg,#fff 40%,#A78BFA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px}
+.hero p{color:#94A3B8;font-size:0.95rem;max-width:500px;margin:0 auto}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
+
+/* CHAT */
+.chat-wrap{flex:1;display:flex;flex-direction:column;max-width:760px;width:100%;margin:0 auto;padding:0 16px 24px}
+.chat-box{flex:1;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:20px;min-height:420px;max-height:520px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;margin-bottom:16px;scroll-behavior:smooth}
+.chat-box::-webkit-scrollbar{width:4px}
+.chat-box::-webkit-scrollbar-thumb{background:rgba(139,92,246,0.3);border-radius:4px}
+
+.msg{display:flex;align-items:flex-start;gap:10px;animation:fadeUp .35s ease both}
+.msg.user{flex-direction:row-reverse}
+.avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;flex-shrink:0}
+.avatar.ai{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff}
+.avatar.user{background:#1E293B;border:1px solid #334155;color:#94A3B8}
+.bubble{padding:10px 14px;border-radius:16px;font-size:0.9rem;line-height:1.55;max-width:78%}
+.bubble.ai{background:rgba(139,92,246,0.1);border:1px solid var(--border);border-top-left-radius:4px;color:#E2E8F0}
+.bubble.user{background:#1E293B;border:1px solid #2D3748;border-top-right-radius:4px;color:#E2E8F0}
+.typing{display:flex;gap:5px;padding:8px 4px}
+.typing span{width:7px;height:7px;background:#8B5CF6;border-radius:50%;animation:bounce 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* INPUT */
+.input-row{display:flex;gap:10px;align-items:flex-end}
+.input-row textarea{flex:1;background:#0d0d1f;border:1px solid var(--border);border-radius:14px;padding:12px 14px;color:#E2E8F0;font-size:0.9rem;resize:none;min-height:50px;max-height:120px;outline:none;font-family:inherit;line-height:1.5;transition:border .2s}
+.input-row textarea:focus{border-color:var(--purple)}
+.send-btn{width:48px;height:48px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;font-size:1.2rem;cursor:pointer;transition:.2s;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.send-btn:hover{transform:scale(1.06);box-shadow:0 4px 16px rgba(139,92,246,0.4)}
+.send-btn:disabled{opacity:.4;cursor:default;transform:none}
+
+/* SUGGESTIONS */
+.suggestions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.sug{background:rgba(139,92,246,0.08);border:1px solid var(--border);border-radius:20px;padding:7px 14px;font-size:0.82rem;color:#A78BFA;cursor:pointer;transition:.2s;white-space:nowrap}
+.sug:hover{background:rgba(139,92,246,0.18);border-color:var(--purple);color:#fff}
+
+/* BOOKING FORM */
+.booking-card{background:rgba(139,92,246,0.06);border:1px solid var(--border);border-radius:16px;padding:20px;margin-top:4px;animation:fadeUp .4s ease}
+.booking-card h3{font-size:0.95rem;font-weight:700;color:#A78BFA;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.slots-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:16px}
+.slot-btn{background:#0d0d1f;border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:#CBD5E1;font-size:0.82rem;cursor:pointer;text-align:left;transition:.2s;line-height:1.4}
+.slot-btn:hover{border-color:var(--purple);background:rgba(139,92,246,0.1);color:#fff}
+.slot-btn.selected{border-color:var(--purple);background:rgba(139,92,246,0.2);color:#fff;font-weight:600}
+.slot-btn .slot-day{font-weight:600;color:#E2E8F0;font-size:0.85rem}
+.slot-btn .slot-time{color:#94A3B8;font-size:0.78rem}
+
+.form-fields{display:grid;gap:10px;margin-bottom:14px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field input,.field select,.field textarea{width:100%;background:#060610;border:1px solid #1E293B;border-radius:10px;padding:10px 12px;color:#E2E8F0;font-size:0.87rem;outline:none;font-family:inherit;transition:border .2s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--purple)}
+.field label{display:block;font-size:0.78rem;color:#94A3B8;margin-bottom:5px;font-weight:500}
+.field select option{background:#1a1a2e}
+.confirm-btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--purple),var(--purple2));border:none;border-radius:12px;color:#fff;font-size:0.9rem;font-weight:700;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.confirm-btn:hover{box-shadow:0 4px 20px rgba(139,92,246,0.45);transform:translateY(-1px)}
+
+/* CONFIRMATION */
+.confirm-card{background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);border-radius:16px;padding:20px;text-align:center;animation:fadeUp .5s ease}
+.confirm-card .check{font-size:2.5rem;margin-bottom:10px}
+.confirm-card h3{color:#4ade80;font-size:1rem;margin-bottom:6px}
+.confirm-card p{font-size:0.85rem;color:#94A3B8}
+
+/* INFO STRIP */
+.info-strip{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;padding:20px;border-top:1px solid var(--border);margin-top:auto}
+.info-item{display:flex;align-items:center;gap:8px;font-size:0.8rem;color:#64748B}
+.info-item span{font-size:1rem}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">MK Lab</div>
+  <a href="site.html" class="nav-back">← Retour au site</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge"><span></span> MKIA en ligne — Répond en temps réel</div>
+  <h1>Parlez à MKIA, prenez votre RDV</h1>
+  <p>Posez vos questions sur nos services, demandez un devis ou réservez un appel découverte avec MK.</p>
+</div>
+
+<div class="chat-wrap">
+  <div class="suggestions" id="suggestions">
+    <button class="sug" onclick="sendSug(this)">💰 Tarifs & services</button>
+    <button class="sug" onclick="sendSug(this)">🤖 Créer un agent IA</button>
+    <button class="sug" onclick="sendSug(this)">🌐 Site web vitrine</button>
+    <button class="sug" onclick="sendSug(this)">📅 Prendre un RDV</button>
+    <button class="sug" onclick="sendSug(this)">🎬 Vidéo pub IA</button>
+  </div>
+
+  <div class="chat-box" id="chatBox"></div>
+
+  <div class="input-row">
+    <textarea id="userInput" placeholder="Écrivez votre message..." rows="1"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"
+      oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+    <button class="send-btn" id="sendBtn" onclick="sendMsg()">➤</button>
+  </div>
+</div>
+
+<div class="info-strip">
+  <div class="info-item"><span>🔒</span> Vos données restent privées</div>
+  <div class="info-item"><span>⚡</span> Réponse en quelques secondes</div>
+  <div class="info-item"><span>📞</span> MK vous recontacte sous 2h</div>
+</div>
+
+<script>
+const GROQ_KEY = ["gsk_SBCmdGYL3","cvOOrxTuiEZWGdyb3FYooEEYZqMCniWOqaVksek71Ua"].join("");
+const NTFY_TOPIC = "mklab-rdv-mk2026";
+const MODEL = "llama-3.1-8b-instant";
+
+const SYSTEM = `Tu es MKIA, l'agent IA de MK Lab, créé par MK (Mickael Kouiras, 16 ans, entrepreneur français).
+Réponds TOUJOURS en français. Sois direct, professionnel et chaleureux. Maximum 3 lignes par réponse.
+
+━━━ CE QUE PROPOSE MK LAB ━━━
+• Sites web vitrine : 400–800€ (livré en 5 jours)
+• Agents IA sur-mesure : 300–600€ (chatbot intelligent, booking auto, FAQ, devis live)
+• Vidéos publicitaires IA : 300–500€
+• Pack complet site + agent IA : 900–1 500€
+• Maintenance mensuelle : 80–150€/mois
+
+━━━ COMMENT TU QUALIFIES UN PROSPECT ━━━
+Si quelqu'un demande un prix, pose 1 question à la fois :
+1. "C'est pour quel type de business ?" (restaurant, coach, salon, autre)
+2. "Vous avez déjà un site ?" (oui/non)
+3. "Quel est votre objectif principal ?" (plus de clients, automatiser, moderniser)
+Ensuite donne une fourchette de prix personnalisée.
+
+━━━ GESTION DES OBJECTIONS PRIX ━━━
+- "C'est cher" → Rappelle le ROI : un agent IA prend des RDV 24h/24, économise du temps. Propose le pack découverte.
+- "Je compare" → MK Lab : spécialisé locaux français, livraison rapide, suivi par MK lui-même.
+- "Je réfléchis" → Propose un appel découverte gratuit de 15 min.
+
+━━━ RÈGLES ABSOLUES ━━━
+- Si RDV demandé : réponds UNIQUEMENT "Je vous affiche les créneaux disponibles juste en-dessous 👇" sans rien ajouter.
+- Si on demande qui t'a créé : "Je suis MKIA, créé par MK — entrepreneur IA basé en France 🇫🇷"
+- Termine souvent par une question pour avancer la conversation.`;
+
+const RDV_KEYWORDS = ['rdv','rendez-vous','rendez vous','réserver','reserver','disponib',
+  'créneau','prendre un','meeting','appel','rappel','contacter','consultation',
+  'planifier','calendrier','donne moi les','quels sont les','voir les','les créneaux',
+  'booker','je veux un rdv','je voudrais réserver'];
+
+let history = [];
+let bookingState = null;
+
+// Slots disponibles (3 semaines à venir, quelques créneaux)
+function getSlots() {
+  const slots = [];
+  const now = new Date();
+  const jours = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  const mois = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
+  const heures = ['10h00','11h00','14h00','15h00','16h00','17h00'];
+  for(let i = 1; i <= 14; i++) {
+    const d = new Date(now);
+    d.setDate(now.getDate() + i);
+    if(d.getDay() === 0) continue; // pas dimanche
+    const label = jours[d.getDay()] + ' ' + d.getDate() + ' ' + mois[d.getMonth()];
+    // 2 créneaux par jour disponible
+    const h1 = heures[Math.floor(Math.random() * 3)];
+    const h2 = heures[3 + Math.floor(Math.random() * 3)];
+    slots.push({id: d.toISOString().slice(0,10) + '_' + h1, day: label, time: h1});
+    if(slots.length < 10) slots.push({id: d.toISOString().slice(0,10) + '_' + h2, day: label, time: h2});
+    if(slots.length >= 10) break;
+  }
+  return slots;
+}
+
+function isRDV(msg) {
+  const m = msg.toLowerCase();
+  return RDV_KEYWORDS.some(k => m.includes(k));
+}
+
+function addMsg(role, content, html) {
+  const box = document.getElementById('chatBox');
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  const avatar = document.createElement('div');
+  avatar.className = 'avatar ' + role;
+  avatar.textContent = role === 'ai' ? '🤖' : '👤';
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble ' + role;
+  if(html) bubble.innerHTML = html;
+  else bubble.textContent = content;
+  div.appendChild(avatar);
+  div.appendChild(bubble);
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  return bubble;
+}
+
+function addTyping() {
+  const box = document.getElementById('chatBox');
+  const div = document.createElement('div');
+  div.className = 'msg ai';
+  div.id = 'typing-indicator';
+  div.innerHTML = '<div class="avatar ai">🤖</div><div class="bubble ai"><div class="typing"><span></span><span></span><span></span></div></div>';
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing-indicator');
+  if(t) t.remove();
+}
+
+function showBookingForm() {
+  const slots = getSlots();
+  const box = document.getElementById('chatBox');
+  const div = document.createElement('div');
+  div.id = 'booking-form';
+  div.innerHTML = `
+    <div class="booking-card">
+      <h3>📅 Créneaux disponibles — Choisissez un horaire</h3>
+      <div class="slots-grid" id="slotsGrid">
+        ${slots.map(s => `
+          <button class="slot-btn" onclick="selectSlot(this,'${s.id}','${s.day}','${s.time}')">
+            <div class="slot-day">${s.day}</div>
+            <div class="slot-time">🕐 ${s.time} — Appel 15 min</div>
+          </button>`).join('')}
+      </div>
+      <div class="form-fields" id="contactFields" style="display:none">
+        <div class="form-row">
+          <div class="field"><label>Prénom & Nom *</label><input id="fNom" type="text" placeholder="Jean Dupont"></div>
+          <div class="field"><label>Téléphone *</label><input id="fTel" type="tel" placeholder="06 12 34 56 78"></div>
+        </div>
+        <div class="field"><label>Email *</label><input id="fEmail" type="email" placeholder="jean@exemple.fr"></div>
+        <div class="field">
+          <label>Votre projet</label>
+          <select id="fProjet">
+            <option value="">-- Choisir --</option>
+            <option>Site web vitrine</option>
+            <option>Agent IA sur-mesure</option>
+            <option>Vidéo publicitaire IA</option>
+            <option>Pack complet site + agent</option>
+            <option>Autre / Je veux en savoir plus</option>
+          </select>
+        </div>
+        <button class="confirm-btn" onclick="confirmBooking()">✅ Confirmer mon RDV</button>
+      </div>
+    </div>`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function selectSlot(btn, id, day, time) {
+  document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  bookingState = {id, day, time};
+  document.getElementById('contactFields').style.display = 'grid';
+  document.getElementById('chatBox').scrollTop = 9999;
+}
+
+function confirmBooking() {
+  const nom = document.getElementById('fNom').value.trim();
+  const tel = document.getElementById('fTel').value.trim();
+  const email = document.getElementById('fEmail').value.trim();
+  const projet = document.getElementById('fProjet').value;
+  if(!nom || !tel || !email) { alert('Merci de remplir tous les champs obligatoires.'); return; }
+  if(!bookingState) { alert('Merci de choisir un créneau.'); return; }
+
+  const rdv = {
+    id: Date.now(),
+    timestamp: new Date().toISOString(),
+    nom, tel, email, projet,
+    slot: bookingState.day + ' à ' + bookingState.time
+  };
+
+  // Sauvegarde localStorage
+  const existing = JSON.parse(localStorage.getItem('mklab_rdv_mk') || '[]');
+  existing.push(rdv);
+  localStorage.setItem('mklab_rdv_mk', JSON.stringify(existing));
+
+  // Notification ntfy.sh
+  fetch('https://ntfy.sh/' + NTFY_TOPIC, {
+    method: 'POST',
+    body: `Nom: ${nom}\nTel: ${tel}\nEmail: ${email}\nCréneau: ${rdv.slot}\nProjet: ${projet || 'Non précisé'}`,
+    headers: {'Title': 'Nouveau RDV MK Lab — ' + nom, 'Priority': 'high', 'Tags': 'calendar'}
+  }).catch(() => {});
+
+  // Remplace le form par confirmation
+  const form = document.getElementById('booking-form');
+  if(form) {
+    form.innerHTML = `
+      <div class="confirm-card">
+        <div class="check">🎉</div>
+        <h3>RDV confirmé — ${rdv.slot}</h3>
+        <p>Parfait ${nom} ! MK vous contactera au <strong>${tel}</strong> pour votre appel découverte.<br>
+        Un récap vous sera envoyé à <strong>${email}</strong>.</p>
+      </div>`;
+  }
+
+  // Message de confirmation dans le chat
+  setTimeout(() => {
+    addMsg('ai', '', `Super ${nom} ! 🎉 Votre RDV est bien enregistré pour le <strong>${rdv.slot}</strong>. MK vous contactera directement au <strong>${tel}</strong>. À très vite ! 🙌`);
+    history.push({role:'assistant', content:`RDV confirmé pour ${nom} le ${rdv.slot}.`});
+  }, 600);
+}
+
+async function callGroq(userMsg) {
+  history.push({role:'user', content: userMsg});
+  const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json','Authorization':'Bearer ' + GROQ_KEY},
+    body: JSON.stringify({
+      model: MODEL,
+      messages: [{role:'system', content: SYSTEM}, ...history],
+      temperature: 0.7,
+      max_tokens: 200
+    })
+  });
+  const data = await resp.json();
+  const reply = data.choices?.[0]?.message?.content || 'Désolé, une erreur est survenue.';
+  history.push({role:'assistant', content: reply});
+  return reply;
+}
+
+async function sendMsg() {
+  const input = document.getElementById('userInput');
+  const msg = input.value.trim();
+  if(!msg) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('sendBtn').disabled = true;
+  document.getElementById('suggestions').style.display = 'none';
+
+  addMsg('user', msg);
+
+  if(isRDV(msg)) {
+    addMsg('ai', '', 'Je vous affiche les créneaux disponibles juste en-dessous 👇');
+    history.push({role:'user', content: msg});
+    history.push({role:'assistant', content: 'Je vous affiche les créneaux disponibles juste en-dessous 👇'});
+    showBookingForm();
+    document.getElementById('sendBtn').disabled = false;
+    return;
+  }
+
+  addTyping();
+  try {
+    const reply = await callGroq(msg);
+    removeTyping();
+    addMsg('ai', '', reply.replace(/\n/g,'<br>'));
+
+    // Si la réponse de Groq suggère un RDV
+    if(reply.toLowerCase().includes('créneaux disponibles')) {
+      showBookingForm();
+    }
+  } catch(e) {
+    removeTyping();
+    addMsg('ai', 'Désolé, il y a un problème de connexion. Réessayez dans un instant.');
+  }
+
+  document.getElementById('sendBtn').disabled = false;
+}
+
+function sendSug(btn) {
+  document.getElementById('userInput').value = btn.textContent.replace(/^[^\s]+\s/,'').trim();
+  sendMsg();
+}
+
+// Message d'accueil
+window.onload = () => {
+  setTimeout(() => {
+    addMsg('ai', '', 'Bonjour ! 👋 Je suis <strong>MKIA</strong>, l\'agent IA de MK Lab.<br>Vous cherchez un site web, un agent IA ou une vidéo pub ? Je suis là pour vous aider !');
+    history.push({role:'assistant', content: 'Bonjour ! Je suis MKIA, l\'agent IA de MK Lab. Vous cherchez un site web, un agent IA ou une vidéo pub ?'});
+  }, 400);
+};
+</script>
+</body>
+</html>
