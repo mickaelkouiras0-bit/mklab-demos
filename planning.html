@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MK Lab — Planning</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0d0d0f; --surface: #16161a; --surface2: #1e1e24;
+      --border: #2a2a35; --accent: #7c5cfc; --accent2: #a78bfa;
+      --green: #22c55e; --orange: #f59e0b; --red: #ef4444;
+      --blue: #3b82f6; --gold: #eab308; --text: #f1f0f5;
+      --muted: #888899; --radius: 14px;
+    }
+    body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; min-height:100vh; }
+
+    /* HEADER */
+    header { display:flex; align-items:center; justify-content:space-between; padding:18px 32px; border-bottom:1px solid var(--border); background:var(--surface); position:sticky; top:0; z-index:100; }
+    .logo { display:flex; align-items:center; gap:12px; }
+    .logo-icon { width:38px; height:38px; background:linear-gradient(135deg,var(--accent),#c084fc); border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:16px; color:white; }
+    .logo-text { font-size:18px; font-weight:700; }
+    .logo-sub { font-size:12px; color:var(--muted); margin-top:1px; }
+    .header-right { display:flex; align-items:center; gap:10px; }
+    .status-dot { width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green); animation:pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+    .status-text { font-size:12px; color:var(--muted); }
+    #btn-refresh { padding:7px 14px; border:1px solid var(--border); background:var(--surface2); color:var(--text); border-radius:8px; cursor:pointer; font-size:13px; transition:background .2s; }
+    #btn-refresh:hover { background:var(--border); }
+    #btn-mkia { padding:7px 14px; border:1px solid rgba(124,92,252,.35); background:rgba(124,92,252,.12); color:var(--accent2); border-radius:8px; font-size:13px; transition:background .2s; text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
+    #btn-mkia:hover { background:rgba(124,92,252,.22); }
+
+    /* MAIN */
+    main { max-width:1280px; margin:0 auto; padding:28px 24px; }
+
+    /* STATS */
+    .stats { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:28px; }
+    .stat { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px 20px; }
+    .stat-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.8px; margin-top:4px; }
+    .stat-value { font-size:30px; font-weight:800; margin-top:4px; }
+    .stat-icon { font-size:20px; }
+    .s-total .stat-value { color:var(--accent2); }
+    .s-pending .stat-value { color:var(--orange); }
+    .s-done .stat-value { color:var(--green); }
+    .s-slots .stat-value { color:var(--blue); }
+    .s-ca .stat-value { color:var(--gold); }
+
+    /* LAYOUT */
+    .sections { display:grid; grid-template-columns:1fr 320px; gap:22px; align-items:start; }
+    .section-title { font-size:12px; font-weight:700; margin-bottom:14px; color:var(--muted); text-transform:uppercase; letter-spacing:.8px; display:flex; align-items:center; gap:8px; }
+    .section-title span { background:var(--surface2); border:1px solid var(--border); border-radius:20px; padding:2px 9px; font-size:11px; color:var(--text); font-weight:600; }
+
+    /* RDV CARDS */
+    .rdv-list { display:flex; flex-direction:column; gap:10px; }
+    .rdv-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; transition:border-color .2s; }
+    .rdv-card:hover { border-color:var(--accent); }
+    .rdv-header { display:flex; align-items:center; gap:12px; padding:14px 18px; cursor:pointer; user-select:none; }
+    .rdv-avatar { width:42px; height:42px; border-radius:11px; background:linear-gradient(135deg,var(--accent),#c084fc); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; color:white; flex-shrink:0; }
+    .rdv-info { flex:1; min-width:0; }
+    .rdv-name { font-weight:700; font-size:14px; }
+    .rdv-meta { font-size:12px; color:var(--muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .rdv-time { font-size:11px; color:#44445a; margin-top:1px; }
+    .rdv-right { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+    .badge { padding:3px 9px; border-radius:20px; font-size:11px; font-weight:600; }
+    .badge-pending { background:rgba(245,158,11,.15); color:var(--orange); }
+    .badge-done { background:rgba(34,197,94,.15); color:var(--green); }
+    .chevron { color:var(--muted); transition:transform .2s; font-size:13px; }
+    .rdv-card.open .chevron { transform:rotate(180deg); }
+    .rdv-body { display:none; padding:0 18px 16px; border-top:1px solid var(--border); }
+    .rdv-card.open .rdv-body { display:block; }
+
+    /* PIPELINE BAR */
+    .pipeline-bar { display:flex; gap:4px; margin:14px 0 12px; flex-wrap:wrap; }
+    .pip-step { flex:1; min-width:0; padding:5px 6px; border-radius:7px; border:1px solid var(--border); background:var(--surface2); color:var(--muted); font-size:11px; font-weight:600; text-align:center; cursor:pointer; transition:all .15s; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .pip-step:hover { border-color:var(--accent); color:var(--accent2); }
+    .pip-step.active { background:var(--accent); border-color:var(--accent); color:white; }
+    .pip-step.active-done { background:var(--green); border-color:var(--green); color:white; }
+
+    /* DETAIL GRID */
+    .rdv-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+    .detail-item { display:flex; flex-direction:column; gap:3px; }
+    .detail-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+    .detail-value { font-size:13px; font-weight:500; }
+    .detail-full { grid-column:1/-1; }
+    .inline-input { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:7px; color:var(--text); padding:6px 10px; font-size:13px; font-family:inherit; outline:none; transition:border-color .2s; resize:none; }
+    .inline-input:focus { border-color:var(--accent); }
+    .inline-input::placeholder { color:#44445a; }
+
+    /* ACTIONS */
+    .rdv-actions { display:flex; gap:7px; flex-wrap:wrap; margin-top:4px; }
+    .btn { padding:7px 13px; border-radius:8px; border:none; cursor:pointer; font-size:12px; font-weight:600; transition:opacity .2s,transform .1s; font-family:inherit; }
+    .btn:hover { opacity:.85; }
+    .btn:active { transform:scale(.97); }
+    .btn-call { background:rgba(59,130,246,.2); color:var(--blue); border:1px solid rgba(59,130,246,.3); text-decoration:none; display:inline-flex; align-items:center; gap:4px; }
+    .btn-done { background:rgba(34,197,94,.2); color:var(--green); border:1px solid rgba(34,197,94,.3); }
+    .btn-undo { background:rgba(245,158,11,.15); color:var(--orange); border:1px solid rgba(245,158,11,.3); }
+    .btn-delete { background:rgba(239,68,68,.1); color:var(--red); border:1px solid rgba(239,68,68,.25); margin-left:auto; }
+
+    /* SLOTS */
+    .slots-panel { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+    .slots-header { padding:16px 18px 0; }
+    .slots-list { padding:10px 18px; display:flex; flex-direction:column; gap:7px; max-height:400px; overflow-y:auto; }
+    .slots-list::-webkit-scrollbar { width:3px; }
+    .slots-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+    .slot-item { display:flex; align-items:center; justify-content:space-between; padding:9px 11px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; font-size:13px; }
+    .slot-item.reserved { opacity:.55; }
+    .slot-date { font-weight:600; font-size:13px; }
+    .slot-status { font-size:11px; color:var(--muted); margin-top:1px; }
+    .slot-del { background:none; border:none; color:var(--red); cursor:pointer; font-size:14px; opacity:.5; padding:2px 6px; border-radius:4px; transition:opacity .15s,background .15s; }
+    .slot-del:hover { opacity:1; background:rgba(239,68,68,.1); }
+    .add-slot { padding:10px 18px 16px; border-top:1px solid var(--border); display:flex; gap:7px; }
+    .add-slot input { flex:1; background:var(--surface2); border:1px solid var(--border); border-radius:8px; color:var(--text); padding:8px 11px; font-size:13px; outline:none; transition:border-color .2s; font-family:inherit; }
+    .add-slot input:focus { border-color:var(--accent); }
+    .add-slot button { background:var(--accent); border:none; color:white; border-radius:8px; padding:8px 14px; font-size:17px; cursor:pointer; transition:opacity .2s; }
+    .add-slot button:hover { opacity:.85; }
+
+    /* EMPTY / TOAST */
+    .empty { text-align:center; padding:40px 20px; color:var(--muted); font-size:13px; }
+    .empty-icon { font-size:32px; margin-bottom:8px; }
+    .toast { position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:11px 20px; font-size:13px; font-weight:600; z-index:999; transition:transform .3s cubic-bezier(.34,1.56,.64,1); pointer-events:none; }
+    .toast.show { transform:translateX(-50%) translateY(0); }
+
+    /* ── MODAL DEVIS ── */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.72); z-index:500; display:none; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
+    .modal-overlay.open { display:flex; }
+    .modal { background:var(--surface); border:1px solid var(--border); border-radius:18px; width:min(560px,95vw); max-height:90vh; overflow-y:auto; padding:28px; position:relative; }
+    .modal h2 { font-size:17px; font-weight:800; margin-bottom:18px; display:flex; align-items:center; gap:8px; }
+    .modal h2 span { font-size:22px; }
+    .modal-close { position:absolute; top:14px; right:16px; background:none; border:none; color:var(--muted); font-size:20px; cursor:pointer; padding:4px 8px; border-radius:6px; transition:background .2s; }
+    .modal-close:hover { background:var(--surface2); color:var(--text); }
+    .modal-section { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.8px; margin:16px 0 8px; }
+    .modal-client-info { display:grid; grid-template-columns:1fr 1fr; gap:10px; background:var(--surface2); border-radius:10px; padding:12px 14px; margin-bottom:4px; }
+    .mci-item { font-size:12px; }
+    .mci-label { color:var(--muted); font-size:11px; margin-bottom:2px; }
+    .mci-value { font-weight:600; }
+    .ligne-row { display:grid; grid-template-columns:1fr 60px 90px 32px; gap:8px; align-items:center; margin-bottom:8px; }
+    .ligne-row input { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:8px 10px; color:var(--text); font-size:13px; width:100%; outline:none; transition:border-color .2s; }
+    .ligne-row input:focus { border-color:var(--accent); }
+    .ligne-del { background:none; border:none; color:var(--red); font-size:16px; cursor:pointer; padding:4px; border-radius:6px; transition:background .2s; }
+    .ligne-del:hover { background:rgba(239,68,68,.12); }
+    .btn-add-ligne { background:rgba(124,92,252,.1); border:1px dashed rgba(124,92,252,.35); color:var(--accent2); border-radius:8px; padding:8px 14px; font-size:12px; cursor:pointer; transition:background .2s; width:100%; margin-top:4px; }
+    .btn-add-ligne:hover { background:rgba(124,92,252,.2); }
+    .modal-total { display:flex; justify-content:flex-end; align-items:center; gap:12px; padding:12px 0 4px; border-top:1px solid var(--border); margin-top:8px; }
+    .modal-total-label { font-size:13px; color:var(--muted); }
+    .modal-total-val { font-size:22px; font-weight:800; color:var(--accent2); }
+    .modal-notes-input { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--text); font-size:13px; width:100%; outline:none; resize:vertical; min-height:60px; transition:border-color .2s; font-family:inherit; }
+    .modal-notes-input:focus { border-color:var(--accent); }
+    .btn-gen-pdf { background:linear-gradient(135deg,var(--accent),#4f46e5); border:none; color:white; border-radius:10px; padding:12px 24px; font-size:14px; font-weight:700; cursor:pointer; width:100%; margin-top:16px; transition:opacity .2s, transform .2s; display:flex; align-items:center; justify-content:center; gap:8px; }
+    .btn-gen-pdf:hover { opacity:.9; transform:translateY(-1px); }
+    .btn-gen-pdf:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+    .lignes-header { display:grid; grid-template-columns:1fr 60px 90px 32px; gap:8px; margin-bottom:4px; }
+    .lignes-header span { font-size:10px; color:var(--muted); font-weight:600; text-transform:uppercase; }
+    .btn-devis { background:rgba(124,92,252,.12); border:1px solid rgba(124,92,252,.3); color:var(--accent2); border-radius:7px; padding:7px 12px; font-size:12px; cursor:pointer; font-weight:600; transition:background .2s; }
+    .btn-devis:hover { background:rgba(124,92,252,.25); }
+
+    @media(max-width:860px){ .sections{grid-template-columns:1fr;} .stats{grid-template-columns:repeat(2,1fr);} }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">MK</div>
+    <div>
+      <div class="logo-text">MK Lab</div>
+      <div class="logo-sub">Planning & RDV</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="status-dot"></div>
+    <div class="status-text" id="last-update">—</div>
+    <a href="http://localhost:5000" id="btn-mkia">💬 MKIA</a>
+    <button id="btn-refresh">↻ Actualiser</button>
+  </div>
+</header>
+
+<main>
+  <div class="stats">
+    <div class="stat s-total">
+      <div class="stat-icon">📋</div>
+      <div class="stat-value" id="s-total">—</div>
+      <div class="stat-label">Total RDV</div>
+    </div>
+    <div class="stat s-pending">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-value" id="s-pending">—</div>
+      <div class="stat-label">En attente</div>
+    </div>
+    <div class="stat s-done">
+      <div class="stat-icon">✅</div>
+      <div class="stat-value" id="s-done">—</div>
+      <div class="stat-label">Traités</div>
+    </div>
+    <div class="stat s-slots">
+      <div class="stat-icon">📅</div>
+      <div class="stat-value" id="s-slots">—</div>
+      <div class="stat-label">Créneaux libres</div>
+    </div>
+    <div class="stat s-ca">
+      <div class="stat-icon">💰</div>
+      <div class="stat-value" id="s-ca">—</div>
+      <div class="stat-label">CA potentiel</div>
+    </div>
+  </div>
+
+  <div class="sections">
+    <div>
+      <div class="section-title">Rendez-vous <span id="rdv-count">0</span></div>
+      <div class="rdv-list" id="rdv-list">
+        <div class="empty"><div class="empty-icon">📭</div>Chargement...</div>
+      </div>
+    </div>
+
+    <div class="slots-panel">
+      <div class="slots-header">
+        <div class="section-title">Créneaux <span id="slots-count">0</span></div>
+      </div>
+      <div class="slots-list" id="slots-list"></div>
+      <div class="add-slot">
+        <input type="text" id="slot-input" placeholder="ex: Lundi 14h, Sam 10h…" />
+        <button onclick="addSlot()" title="Ajouter">+</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  var API = 'http://localhost:5000';
+  var KEY = 'mklab2026';
+  var rdvData = [];
+  var slotsData = [];
+
+  var PIPELINE = [
+    { key:'nouveau',  label:'🆕 Nouveau' },
+    { key:'devis',    label:'📄 Devis envoyé' },
+    { key:'encours',  label:'⚙️ En cours' },
+    { key:'livre',    label:'📦 Livré' },
+    { key:'paye',     label:'💳 Payé' }
+  ];
+
+  function initials(name) {
+    if (!name) return '?';
+    var p = name.trim().split(' ');
+    return p.length >= 2 ? (p[0][0]+p[1][0]).toUpperCase() : name.slice(0,2).toUpperCase();
+  }
+
+  function showToast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 2500);
+  }
+
+  function setLastUpdate() {
+    var n = new Date();
+    document.getElementById('last-update').textContent =
+      'Mis à jour à '+n.getHours()+':'+String(n.getMinutes()).padStart(2,'0');
+  }
+
+  /* FETCH */
+  function fetchAll() {
+    Promise.all([
+      fetch(API+'/api/rdv?key='+KEY).then(function(r){ return r.json(); }),
+      fetch(API+'/api/allslots?key='+KEY).then(function(r){ return r.json(); })
+    ]).then(function(res){
+      rdvData = res[0]; slotsData = res[1];
+      renderAll(); setLastUpdate();
+    }).catch(function(){
+      try {
+        rdvData = JSON.parse(localStorage.getItem('mklab_rdv')||'[]');
+        slotsData = JSON.parse(localStorage.getItem('mklab_slots')||'[]');
+      } catch(e){ rdvData=[]; slotsData=[]; }
+      renderAll(); setLastUpdate();
+    });
+  }
+
+  /* RENDER */
+  function renderAll(){ renderStats(); renderRdv(); renderSlots(); }
+
+  function renderStats() {
+    var total = rdvData.length;
+    var pending = rdvData.filter(function(r){ return r.status !== 'done'; }).length;
+    var done = rdvData.filter(function(r){ return r.status === 'done'; }).length;
+    var free = slotsData.filter(function(s){ return !s.booked; }).length;
+    var ca = rdvData.reduce(function(sum, r){
+      var b = parseFloat((r.budget||'').toString().replace(/[^\d.]/g,''));
+      return sum + (isNaN(b) ? 0 : b);
+    }, 0);
+    document.getElementById('s-total').textContent = total;
+    document.getElementById('s-pending').textContent = pending;
+    document.getElementById('s-done').textContent = done;
+    document.getElementById('s-slots').textContent = free;
+    document.getElementById('s-ca').textContent = ca > 0 ? ca+'€' : '—';
+    document.getElementById('rdv-count').textContent = total;
+  }
+
+  function renderRdv() {
+    var el = document.getElementById('rdv-list');
+    if (!rdvData.length) {
+      el.innerHTML = '<div class="empty"><div class="empty-icon">📭</div>Aucun rendez-vous pour l\'instant.</div>';
+      return;
+    }
+    var sorted = rdvData.slice().sort(function(a,b){
+      if (a.status==='done' && b.status!=='done') return 1;
+      if (a.status!=='done' && b.status==='done') return -1;
+      return 0;
+    });
+    el.innerHTML = sorted.map(function(rdv){
+      var isDone = rdv.status === 'done';
+      var nom = rdv.nom || rdv.name || rdv.prenom || 'Inconnu';
+      var pip = rdv.pipeline || 'nouveau';
+      var pipHtml = PIPELINE.map(function(s){
+        var isActive = s.key === pip;
+        var cls = isActive ? (s.key==='paye' ? 'pip-step active-done' : 'pip-step active') : 'pip-step';
+        return '<button class="'+cls+'" onclick="setPipeline(\''+rdv.id+'\',\''+s.key+'\')">'+escHtml(s.label)+'</button>';
+      }).join('');
+      return '<div class="rdv-card" id="card-'+rdv.id+'">' +
+        '<div class="rdv-header" onclick="toggleCard(\''+rdv.id+'\')">' +
+          '<div class="rdv-avatar">'+initials(nom)+'</div>' +
+          '<div class="rdv-info">' +
+            '<div class="rdv-name">'+escHtml(nom)+'</div>' +
+            '<div class="rdv-meta">'+escHtml(rdv.slot||rdv.date||'—')+' · '+escHtml(rdv.email||'—')+'</div>' +
+            '<div class="rdv-time">Reçu le '+escHtml(rdv.created_at||'—')+'</div>' +
+          '</div>' +
+          '<div class="rdv-right">' +
+            '<span class="badge '+(isDone?'badge-done':'badge-pending')+'">'+(isDone?'Traité':'En attente')+'</span>' +
+            '<span class="chevron">▾</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="rdv-body">' +
+          '<div class="pipeline-bar">'+pipHtml+'</div>' +
+          '<div class="rdv-detail-grid">' +
+            '<div class="detail-item"><div class="detail-label">Nom</div><div class="detail-value">'+escHtml(nom)+'</div></div>' +
+            '<div class="detail-item"><div class="detail-label">Téléphone</div><div class="detail-value">'+escHtml(rdv.tel||rdv.phone||'—')+'</div></div>' +
+            '<div class="detail-item"><div class="detail-label">Email</div><div class="detail-value">'+escHtml(rdv.email||'—')+'</div></div>' +
+            '<div class="detail-item"><div class="detail-label">Créneau</div><div class="detail-value">'+escHtml(rdv.slot||rdv.date||'—')+'</div></div>' +
+            '<div class="detail-item detail-full"><div class="detail-label">Budget estimé (€)</div>' +
+              '<input class="inline-input" placeholder="ex: 500" value="'+escHtml(rdv.budget||'')+'" onblur="saveField(\''+rdv.id+'\',\'budget\',this.value)" /></div>' +
+            (rdv.projet||rdv.project ? '<div class="detail-item detail-full"><div class="detail-label">Projet</div><div class="detail-value" style="color:var(--muted);font-size:12px;margin-top:2px">'+escHtml(rdv.projet||rdv.project)+'</div></div>' : '') +
+            '<div class="detail-item detail-full"><div class="detail-label">Notes personnelles</div>' +
+              '<textarea class="inline-input" rows="2" placeholder="Tes notes après l\'appel..." onblur="saveField(\''+rdv.id+'\',\'notes\',this.value)">'+escHtml(rdv.notes||'')+'</textarea></div>' +
+           '</div>' +
+         '<div class="rdv-actions">' +
+            (rdv.tel||rdv.phone ? '<a class="btn btn-call" href="tel:'+escHtml(rdv.tel||rdv.phone)+'">📞 Appeler</a>' : '') +
+            '<button class="btn-devis" onclick="openDevis(\''+rdv.id+'\')">📄 Générer devis</button>' +
+            (isDone
+              ? '<button class="btn btn-undo" onclick="setStatus(\''+rdv.id+'\',\'pending\')">↩ Remettre</button>'
+              : '<button class="btn btn-done" onclick="setStatus(\''+rdv.id+'\',\'done\')">✅ Traité</button>') +
+            '<button class="btn btn-delete" onclick="deleteRdv(\''+rdv.id+'\')">🗑 Supprimer</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function renderSlots() {
+    var el = document.getElementById('slots-list');
+    document.getElementById('slots-count').textContent = slotsData.length;
+    if (!slotsData.length) {
+      el.innerHTML = '<div class="empty" style="padding:20px"><div class="empty-icon">🗓️</div>Aucun créneau</div>';
+      return;
+    }
+    el.innerHTML = slotsData.map(function(s){
+      return '<div class="slot-item '+(s.booked?'reserved':'')+'">' +
+        '<div>' +
+          '<div class="slot-date">'+escHtml(s.label||s.id)+'</div>' +
+          '<div class="slot-status">'+(s.booked?'🔒 Réservé'+(s.client?' · '+escHtml(s.client):''):'✓ Libre')+'</div>' +
+        '</div>' +
+        '<button class="slot-del" onclick="deleteSlot(\''+s.id+'\')" title="Supprimer">✕</button>' +
+      '</div>';
+    }).join('');
+  }
+
+  /* ACTIONS */
+  function toggleCard(id) {
+    document.getElementById('card-'+id).classList.toggle('open');
+  }
+
+  function apiPut(id, body, toast) {
+    fetch(API+'/api/rdv/'+id+'?key='+KEY, {
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    }).then(function(){
+      if (toast) showToast(toast);
+      fetchAll();
+    }).catch(function(){
+      rdvData = rdvData.map(function(r){ return r.id===id ? Object.assign({},r,body) : r; });
+      if (toast) showToast(toast);
+      renderAll();
+    });
+  }
+
+  function setStatus(id, status) {
+    apiPut(id, {status:status}, status==='done' ? '✅ Marqué traité' : '↩ Remis en attente');
+  }
+
+  function setPipeline(id, pip) {
+    apiPut(id, {pipeline:pip}, null);
+    // mise à jour locale immédiate
+    rdvData = rdvData.map(function(r){ return r.id===id ? Object.assign({},r,{pipeline:pip}) : r; });
+    renderRdv();
+  }
+
+  function saveField(id, field, value) {
+    var body = {}; body[field] = value;
+    apiPut(id, body, field==='budget' ? '💰 Budget sauvegardé' : '📝 Note sauvegardée');
+  }
+
+  function deleteRdv(id) {
+    if (!confirm('Supprimer ce RDV ?')) return;
+    fetch(API+'/api/rdv/'+id+'?key='+KEY, {method:'DELETE'})
+      .then(function(){ showToast('🗑 RDV supprimé'); fetchAll(); })
+      .catch(function(){
+        rdvData = rdvData.filter(function(r){ return r.id!==id; });
+        showToast('🗑 RDV supprimé'); renderAll();
+      });
+  }
+
+  function addSlot() {
+    var input = document.getElementById('slot-input');
+    var label = input.value.trim();
+    if (!label) return;
+    fetch(API+'/api/slots', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({label:label, key:KEY})
+    }).then(function(){ input.value=''; showToast('📅 Créneau ajouté'); fetchAll(); })
+    .catch(function(){
+      slotsData.push({id:Date.now().toString(), label:label, booked:false});
+      input.value=''; showToast('📅 Créneau ajouté (local)'); renderSlots();
+    });
+  }
+
+  function deleteSlot(id) {
+    fetch(API+'/api/slots/'+id+'?key='+KEY, {method:'DELETE'})
+      .then(function(){ showToast('Créneau supprimé'); fetchAll(); })
+      .catch(function(){
+        slotsData = slotsData.filter(function(s){ return s.id!==id; });
+        showToast('Créneau supprimé'); renderSlots();
+      });
+  }
+
+  function escHtml(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  document.getElementById('btn-refresh').addEventListener('click', fetchAll);
+  document.getElementById('slot-input').addEventListener('keydown', function(e){ if(e.key==='Enter') addSlot(); });
+
+  fetchAll();
+  setInterval(fetchAll, 30000);
+
+  /* ════════════════════════════════
+     GÉNÉRATEUR DE DEVIS
+  ════════════════════════════════ */
+  var devisRdvId = null;
+  var devisLignes = [];
+
+  var SERVICES_PRESET = [
+    { desc: 'Site web vitrine (design + dev)', prix: 600 },
+    { desc: 'Vidéo pub IA (30s)', prix: 400 },
+    { desc: 'Agent IA personnalisé', prix: 400 },
+    { desc: 'Pack complet (site + vidéo + agent)', prix: 1500 },
+  ];
+
+  function openDevis(rdvId) {
+    devisRdvId = rdvId;
+    var rdv = rdvData.find(function(r){ return r.id === rdvId; });
+    if (!rdv) return;
+    var nom = rdv.nom || rdv.name || rdv.prenom || 'Client';
+
+    // Pré-remplir infos client
+    document.getElementById('dv-nom').textContent    = escHtml(nom);
+    document.getElementById('dv-email').textContent  = escHtml(rdv.email || '—');
+    document.getElementById('dv-tel').textContent    = escHtml(rdv.tel || rdv.phone || '—');
+    document.getElementById('dv-projet').textContent = escHtml(rdv.projet || rdv.project || '—');
+    document.getElementById('dv-notes').value = rdv.notes || '';
+
+    // Lignes par défaut : une ligne vide ou le budget si défini
+    devisLignes = [];
+    if (rdv.budget && parseFloat(rdv.budget) > 0) {
+      devisLignes.push({ desc: rdv.projet || 'Prestation MK Lab', qty: 1, prix: parseFloat(rdv.budget) });
+    } else {
+      devisLignes.push({ desc: '', qty: 1, prix: 0 });
+    }
+    renderLignes();
+    document.getElementById('modal-devis').classList.add('open');
+  }
+
+  function closeDevis() {
+    document.getElementById('modal-devis').classList.remove('open');
+    devisRdvId = null;
+  }
+
+  function renderLignes() {
+    var container = document.getElementById('dv-lignes');
+    container.innerHTML = devisLignes.map(function(l, i){
+      return '<div class="ligne-row">' +
+        '<input type="text" placeholder="Description..." value="'+escHtml(l.desc)+'" oninput="updateLigne('+i+',\'desc\',this.value)" />' +
+        '<input type="number" min="1" value="'+l.qty+'" oninput="updateLigne('+i+',\'qty\',this.value)" style="text-align:center" />' +
+        '<input type="number" min="0" value="'+l.prix+'" oninput="updateLigne('+i+',\'prix\',this.value)" placeholder="€" />' +
+        '<button class="ligne-del" onclick="removeLigne('+i+')" title="Supprimer">✕</button>' +
+      '</div>';
+    }).join('');
+    updateTotal();
+  }
+
+  function updateLigne(i, field, val) {
+    if (field === 'desc') devisLignes[i].desc = val;
+    else if (field === 'qty') devisLignes[i].qty = parseFloat(val) || 1;
+    else if (field === 'prix') devisLignes[i].prix = parseFloat(val) || 0;
+    updateTotal();
+  }
+
+  function removeLigne(i) {
+    if (devisLignes.length === 1) return;
+    devisLignes.splice(i, 1);
+    renderLignes();
+  }
+
+  function addLigne() {
+    devisLignes.push({ desc: '', qty: 1, prix: 0 });
+    renderLignes();
+    // Focus sur le dernier input desc
+    var rows = document.querySelectorAll('.ligne-row');
+    var last = rows[rows.length - 1];
+    if (last) last.querySelector('input').focus();
+  }
+
+  function addPreset(idx) {
+    var p = SERVICES_PRESET[idx];
+    devisLignes.push({ desc: p.desc, qty: 1, prix: p.prix });
+    renderLignes();
+  }
+
+  function updateTotal() {
+    var total = devisLignes.reduce(function(s, l){ return s + (l.qty * l.prix); }, 0);
+    document.getElementById('dv-total').textContent = total.toLocaleString('fr-FR') + ' €';
+  }
+
+  function generatePDF() {
+    var btn = document.getElementById('btn-gen-pdf');
+    btn.disabled = true;
+    btn.textContent = '⏳ Génération en cours...';
+
+    var rdv = rdvData.find(function(r){ return r.id === devisRdvId; });
+    var nom = rdv ? (rdv.nom || rdv.name || rdv.prenom || 'Client') : 'Client';
+
+    var payload = {
+      nom:    nom,
+      email:  rdv ? (rdv.email || '') : '',
+      tel:    rdv ? (rdv.tel || rdv.phone || '') : '',
+      projet: rdv ? (rdv.projet || rdv.project || '') : '',
+      notes:  document.getElementById('dv-notes').value,
+      lignes: devisLignes
+    };
+
+    fetch(API + '/api/devis', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(function(res) {
+      if (!res.ok) {
+        return res.text().then(function(txt){
+          var msg = txt;
+          try { var j = JSON.parse(txt); msg = j.error || txt; } catch(e) {}
+          throw new Error(msg.slice(0, 300));
+        });
+      }
+      return res.blob();
+    })
+    .then(function(blob) {
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      var safe = nom.replace(/[^a-zA-Z0-9]/g, '_');
+      a.download = 'Devis_MKLab_' + safe + '.pdf';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('📄 Devis téléchargé !');
+      closeDevis();
+    })
+    .catch(function(err) {
+      showToast('❌ Erreur : ' + err.message);
+    })
+    .finally(function() {
+      btn.disabled = false;
+      btn.innerHTML = '📄 Télécharger PDF';
+    });
+  }
+
+  function sendDevis() {
+    var rdv = rdvData.find(function(r){ return r.id === devisRdvId; });
+    var email = rdv ? (rdv.email || '') : '';
+    if (!email) { showToast('❌ Pas d\'email pour ce client'); return; }
+
+    var btn = document.getElementById('btn-send-pdf');
+    btn.disabled = true;
+    btn.textContent = '⏳ Envoi en cours...';
+
+    var nom = rdv ? (rdv.nom || rdv.name || 'Client') : 'Client';
+    var payload = {
+      nom: nom, email: email,
+      tel: rdv ? (rdv.tel || rdv.phone || '') : '',
+      projet: rdv ? (rdv.projet || rdv.project || '') : '',
+      notes: document.getElementById('dv-notes').value,
+      lignes: devisLignes
+    };
+
+    fetch(API + '/api/devis/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(function(res) {
+      return res.json().then(function(j) {
+        if (!res.ok) throw new Error(j.error || 'Erreur serveur');
+        return j;
+      });
+    })
+    .then(function(j) {
+      showToast('📧 Devis envoyé à ' + email + ' !');
+      closeDevis();
+    })
+    .catch(function(err) {
+      showToast('❌ ' + err.message);
+    })
+    .finally(function() {
+      btn.disabled = false;
+      btn.textContent = '📧 Envoyer au client';
+    });
+  }
+
+  document.getElementById('modal-devis').addEventListener('click', function(e){
+    if (e.target === this) closeDevis();
+  });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeDevis(); });
+</script>
+
+<!-- ═══ MODAL DEVIS ═══ -->
+<div class="modal-overlay" id="modal-devis">
+  <div class="modal">
+    <button class="modal-close" onclick="closeDevis()">✕</button>
+    <h2><span>📄</span> Générer un devis</h2>
+
+    <div class="modal-section">Client</div>
+    <div class="modal-client-info">
+      <div class="mci-item"><div class="mci-label">Nom</div><div class="mci-value" id="dv-nom">—</div></div>
+      <div class="mci-item"><div class="mci-label">Email</div><div class="mci-value" id="dv-email">—</div></div>
+      <div class="mci-item"><div class="mci-label">Téléphone</div><div class="mci-value" id="dv-tel">—</div></div>
+      <div class="mci-item"><div class="mci-label">Projet</div><div class="mci-value" id="dv-projet">—</div></div>
+    </div>
+
+    <div class="modal-section">Prestations rapides</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
+      <button class="btn-add-ligne" style="width:auto;padding:6px 12px" onclick="addPreset(0)">+ Site web (600€)</button>
+      <button class="btn-add-ligne" style="width:auto;padding:6px 12px" onclick="addPreset(1)">+ Vidéo pub (400€)</button>
+      <button class="btn-add-ligne" style="width:auto;padding:6px 12px" onclick="addPreset(2)">+ Agent IA (400€)</button>
+      <button class="btn-add-ligne" style="width:auto;padding:6px 12px" onclick="addPreset(3)">+ Pack complet (1500€)</button>
+    </div>
+
+    <div class="modal-section">Lignes du devis</div>
+    <div class="lignes-header">
+      <span>Description</span><span style="text-align:center">Qté</span><span style="text-align:right">Prix unit.</span><span></span>
+    </div>
+    <div id="dv-lignes"></div>
+    <button class="btn-add-ligne" onclick="addLigne()">＋ Ajouter une ligne</button>
+
+    <div class="modal-total">
+      <span class="modal-total-label">TOTAL HT</span>
+      <span class="modal-total-val" id="dv-total">0 €</span>
+    </div>
+    <div style="font-size:11px;color:var(--muted);text-align:right;margin-top:2px">TVA non applicable — Art. 293B CGI</div>
+
+    <div class="modal-section">Notes (optionnel)</div>
+    <textarea class="modal-notes-input" id="dv-notes" placeholder="Ex: Inclut 3 révisions, livraison sous 2 semaines..."></textarea>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px">
+      <button class="btn-gen-pdf" id="btn-gen-pdf" onclick="generatePDF()" style="margin-top:0">📄 Télécharger PDF</button>
+      <button class="btn-gen-pdf" id="btn-send-pdf" onclick="sendDevis()" style="margin-top:0;background:linear-gradient(135deg,#059669,#0D9488)">📧 Envoyer au client</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
