@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>MK Lab — Agence IA & Digital</title>
+<meta name="description" content="MK Lab crée des sites web, vidéos pub IA et agents IA pour propulser votre business."/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%238B5CF6'/><text y='72' x='8' font-size='52' fill='white' font-weight='900' font-family='Arial'>MK</text></svg>"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#07090F;--surface:#0D1117;--surface2:#131B2A;
+  --border:rgba(139,92,246,0.12);--border2:rgba(139,92,246,0.28);
+  --accent:#8B5CF6;--accent2:#A78BFA;--cyan:#06B6D4;
+  --green:#10B981;--text:#E2E8F0;--muted:#64748B;--white:#fff;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--accent);border-radius:4px;}
+
+/* ═══ NOISE OVERLAY ═══ */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.4;}
+
+/* ═══ NAVBAR ═══ */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:0 5%;height:68px;display:flex;align-items:center;justify-content:space-between;transition:all .4s;}
+nav.scrolled{background:rgba(7,9,15,0.88);border-bottom:1px solid var(--border);backdrop-filter:blur(20px);}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.nav-logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--cyan));border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:white;box-shadow:0 0 20px rgba(139,92,246,0.4);}
+.nav-logo-text{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;color:var(--white);}
+.nav-links{display:flex;align-items:center;gap:30px;list-style:none;}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:color .2s;position:relative;}
+.nav-links a::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:1px;background:var(--accent2);transform:scaleX(0);transition:transform .2s;}
+.nav-links a:hover{color:var(--white);}
+.nav-links a:hover::after{transform:scaleX(1);}
+.nav-cta{background:linear-gradient(135deg,var(--accent),#4F46E5);color:white;padding:9px 20px;border-radius:10px;text-decoration:none;font-size:14px;font-weight:600;transition:all .2s;box-shadow:0 4px 20px rgba(139,92,246,0.35);}
+.nav-cta:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(139,92,246,0.5);}
+.nav-mobile-btn{display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;}
+@media(max-width:768px){.nav-links,.nav-cta{display:none;}.nav-mobile-btn{display:block;}}
+
+/* ═══ HERO ═══ */
+#hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 5% 80px;position:relative;overflow:hidden;}
+#particles{position:absolute;inset:0;pointer-events:none;}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);animation:orbFloat 8s ease-in-out infinite;}
+.orb1{width:500px;height:500px;background:rgba(139,92,246,0.12);top:-100px;left:50%;transform:translateX(-50%);}
+.orb2{width:300px;height:300px;background:rgba(6,182,212,0.07);bottom:100px;right:5%;animation-delay:-3s;}
+.orb3{width:200px;height:200px;background:rgba(139,92,246,0.08);top:30%;left:5%;animation-delay:-5s;}
+@keyframes orbFloat{0%,100%{transform:translateY(0) translateX(-50%);}50%{transform:translateY(-30px) translateX(-50%);}}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(139,92,246,0.1);border:1px solid var(--border2);border-radius:30px;padding:7px 16px;font-size:13px;color:var(--accent2);margin-bottom:28px;animation:fadeUp .7s both;position:relative;z-index:1;}
+.hero-badge-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:breathe 2s infinite;}
+@keyframes breathe{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+h1.hero-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2.4rem,6vw,4.4rem);line-height:1.08;letter-spacing:-.03em;color:var(--white);margin-bottom:22px;animation:fadeUp .7s .1s both;position:relative;z-index:1;}
+h1.hero-title .grad{background:linear-gradient(90deg,var(--accent2) 0%,var(--cyan) 60%,var(--accent2) 100%);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradShift 4s linear infinite;}
+@keyframes gradShift{0%{background-position:0%}100%{background-position:200%}}
+.hero-sub{font-size:clamp(1rem,2vw,1.15rem);color:var(--muted);max-width:560px;line-height:1.8;margin-bottom:42px;animation:fadeUp .7s .2s both;position:relative;z-index:1;}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;animation:fadeUp .7s .3s both;position:relative;z-index:1;}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#4F46E5);color:white;padding:14px 28px;border-radius:12px;text-decoration:none;font-size:15px;font-weight:600;transition:all .25s;box-shadow:0 4px 28px rgba(139,92,246,0.45);}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 10px 40px rgba(139,92,246,0.55);}
+.btn-secondary{background:rgba(255,255,255,0.04);color:var(--text);padding:14px 28px;border-radius:12px;text-decoration:none;font-size:15px;font-weight:600;border:1px solid var(--border2);transition:all .25s;backdrop-filter:blur(8px);}
+.btn-secondary:hover{background:rgba(139,92,246,0.1);transform:translateY(-3px);}
+.hero-scroll{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);font-size:11px;animation:fadeUp .7s .6s both;z-index:1;}
+.hero-scroll-line{width:1px;height:36px;background:linear-gradient(to bottom,var(--accent2),transparent);animation:scrollAnim 1.8s ease-in-out infinite;}
+@keyframes scrollAnim{0%,100%{opacity:.3;transform:scaleY(1)}50%{opacity:1;transform:scaleY(1.3)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+
+/* ═══ STATS ═══ */
+#stats{padding:40px 5%;border-top:1px solid var(--border);border-bottom:1px solid var(--border);position:relative;}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);}
+.stat-item{text-align:center;padding:22px;border-right:1px solid var(--border);}
+.stat-item:last-child{border-right:none;}
+.stat-num{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,var(--accent2),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.stat-label{font-size:12px;color:var(--muted);margin-top:4px;}
+
+/* ═══ SECTIONS ═══ */
+section{padding:90px 5%;position:relative;}
+.section-label{font-size:11px;color:var(--accent2);text-transform:uppercase;letter-spacing:1.8px;font-weight:600;margin-bottom:14px;}
+.section-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.8rem,4vw,2.7rem);color:var(--white);line-height:1.12;margin-bottom:16px;}
+.section-title .grad{background:linear-gradient(90deg,var(--accent2),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.section-sub{color:var(--muted);font-size:15px;line-height:1.8;max-width:520px;}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1);}
+.reveal.visible{opacity:1;transform:none;}
+.reveal-delay-1{transition-delay:.1s;}
+.reveal-delay-2{transition-delay:.2s;}
+.reveal-delay-3{transition-delay:.3s;}
+.reveal-delay-4{transition-delay:.4s;}
+
+/* ═══ SERVICES ═══ */
+.services-header{text-align:center;margin-bottom:52px;}
+.services-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;max-width:980px;margin:0 auto;}
+.service-card{background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:32px;transition:all .4s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden;cursor:pointer;}
+.service-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(139,92,246,0.07),transparent 60%);opacity:0;transition:opacity .3s;}
+.service-card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(139,92,246,0.5),transparent);opacity:0;transition:opacity .3s;}
+.service-card:hover{transform:translateY(-8px) scale(1.01);border-color:rgba(139,92,246,0.35);box-shadow:0 24px 60px rgba(139,92,246,0.18),0 0 0 1px rgba(139,92,246,0.1);}
+.service-card:hover::before,.service-card:hover::after{opacity:1;}
+.service-icon{font-size:2.5rem;margin-bottom:18px;display:block;filter:drop-shadow(0 0 12px rgba(139,92,246,0.3));}
+.service-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--white);margin-bottom:10px;}
+.service-desc{color:var(--muted);font-size:13.5px;line-height:1.7;margin-bottom:20px;}
+.service-features{list-style:none;display:flex;flex-direction:column;gap:7px;margin-bottom:22px;}
+.service-features li{display:flex;align-items:center;gap:8px;font-size:13px;color:#94A3B8;}
+.service-features li::before{content:'✓';color:var(--green);font-weight:700;}
+.service-price{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;background:linear-gradient(90deg,var(--accent2),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.service-price-sub{font-size:12px;color:var(--muted);}
+.service-card.featured{border-color:rgba(139,92,246,0.3);background:linear-gradient(135deg,rgba(139,92,246,0.07),rgba(6,182,212,0.03));}
+.featured-tag{position:absolute;top:18px;right:18px;background:linear-gradient(135deg,var(--accent),#4F46E5);color:white;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:.3px;}
+.service-see-more{display:inline-flex;align-items:center;gap:6px;margin-top:16px;font-size:13px;color:var(--accent2);font-weight:600;cursor:pointer;transition:gap .2s;}
+.service-see-more:hover{gap:10px;}
+
+/* ═══ PORTFOLIO ═══ */
+#portfolio{background:linear-gradient(180deg,transparent,rgba(139,92,246,0.03),transparent);}
+.portfolio-header{text-align:center;margin-bottom:48px;}
+.portfolio-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:1100px;margin:0 auto;}
+.portfolio-card{border-radius:18px;overflow:hidden;border:1px solid var(--border);background:var(--surface);cursor:pointer;transition:all .4s cubic-bezier(.16,1,.3,1);position:relative;}
+.portfolio-card:hover{transform:translateY(-6px);border-color:var(--border2);box-shadow:0 20px 50px rgba(139,92,246,0.2);}
+.portfolio-preview{height:180px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.portfolio-card:hover .portfolio-overlay{opacity:1;}
+.portfolio-overlay{position:absolute;inset:0;background:rgba(7,9,15,0.7);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;backdrop-filter:blur(4px);}
+.portfolio-overlay-btn{background:linear-gradient(135deg,var(--accent),#4F46E5);color:white;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;border:none;cursor:pointer;}
+.portfolio-info{padding:18px 20px;}
+.portfolio-tag{font-size:10px;color:var(--accent2);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:6px;}
+.portfolio-title{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--white);margin-bottom:5px;}
+.portfolio-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+
+/* MOCKUPS dans les cards */
+.mock-site{background:linear-gradient(135deg,#0a0f1e,#0d1529);width:100%;height:100%;display:flex;flex-direction:column;padding:12px;}
+.mock-bar{height:6px;background:rgba(139,92,246,0.2);border-radius:3px;margin-bottom:8px;width:60%;}
+.mock-hero{flex:1;background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(6,182,212,0.08));border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;}
+.mock-hero-title{height:8px;background:rgba(255,255,255,0.3);border-radius:4px;width:70%;}
+.mock-hero-sub{height:5px;background:rgba(255,255,255,0.1);border-radius:3px;width:50%;}
+.mock-hero-btn{height:16px;background:linear-gradient(135deg,var(--accent),#4F46E5);border-radius:6px;width:30%;margin-top:4px;}
+
+.mock-video{background:linear-gradient(135deg,#0a0a14,#14081e);width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.mock-video::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(139,92,246,0.2),transparent 70%);}
+.mock-play{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:18px;backdrop-filter:blur(8px);z-index:1;animation:playPulse 2s ease-in-out infinite;}
+@keyframes playPulse{0%,100%{box-shadow:0 0 0 0 rgba(139,92,246,0.4)}50%{box-shadow:0 0 0 12px rgba(139,92,246,0)}}
+.mock-video-lines{position:absolute;bottom:12px;left:12px;right:12px;display:flex;flex-direction:column;gap:4px;}
+.mock-vline{height:3px;border-radius:2px;background:rgba(255,255,255,0.1);}
+.mock-vline.active{background:linear-gradient(90deg,var(--accent),var(--cyan));width:40%;}
+
+.mock-agent{background:linear-gradient(135deg,#08080f,#0d0818);width:100%;height:100%;padding:12px;display:flex;flex-direction:column;gap:6px;}
+.mock-msg{border-radius:10px;padding:7px 10px;font-size:9px;max-width:75%;line-height:1.4;}
+.mock-msg.ai{background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.15);color:#A78BFA;align-self:flex-start;}
+.mock-msg.user{background:linear-gradient(135deg,#6D28D9,#4F46E5);color:white;align-self:flex-end;}
+
+/* ═══ POURQUOI ═══ */
+#pourquoi{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;}
+.trust-cards{display:flex;flex-direction:column;gap:16px;}
+.trust-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;display:flex;gap:14px;align-items:flex-start;transition:all .3s;position:relative;overflow:hidden;}
+.trust-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--accent),var(--cyan));opacity:0;transition:opacity .3s;}
+.trust-card:hover{border-color:var(--border2);transform:translateX(4px);}
+.trust-card:hover::before{opacity:1;}
+.trust-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.t-purple{background:rgba(139,92,246,0.15);}
+.t-cyan{background:rgba(6,182,212,0.12);}
+.t-green{background:rgba(16,185,129,0.12);}
+.trust-card h3{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--white);margin-bottom:5px;}
+.trust-card p{font-size:13px;color:var(--muted);line-height:1.65;}
+
+/* ═══ APROPOS ═══ */
+#apropos{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.apropos-inner{display:grid;grid-template-columns:auto 1fr;gap:56px;align-items:center;max-width:880px;margin:0 auto;}
+.apropos-avatar{width:150px;height:150px;border-radius:24px;background:linear-gradient(135deg,var(--accent),var(--cyan));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:2.4rem;color:white;flex-shrink:0;box-shadow:0 0 0 4px rgba(139,92,246,0.15),0 20px 60px rgba(139,92,246,0.35),0 0 80px rgba(6,182,212,0.1);}
+.apropos-quote{font-size:1.2rem;font-weight:500;color:var(--white);line-height:1.65;margin-bottom:20px;font-style:italic;}
+.apropos-quote::before{content:'\201C';color:var(--accent2);font-size:2rem;line-height:0;vertical-align:-.4em;margin-right:4px;}
+.apropos-tags{display:flex;flex-wrap:wrap;gap:8px;}
+.tag{background:rgba(139,92,246,0.08);border:1px solid var(--border2);border-radius:20px;padding:5px 13px;font-size:12px;color:var(--accent2);font-weight:500;transition:background .2s;}
+.tag:hover{background:rgba(139,92,246,0.18);}
+
+/* ═══ MKIA SECTION ═══ */
+#mkia-section{text-align:center;}
+.mkia-header{margin-bottom:36px;}
+.mkia-wrapper{max-width:740px;margin:0 auto;border-radius:24px;overflow:hidden;border:1px solid var(--border2);box-shadow:0 0 0 1px rgba(139,92,246,0.08),0 30px 80px rgba(139,92,246,0.25),0 0 120px rgba(6,182,212,0.06);}
+.mkia-wrapper iframe{width:100%;height:560px;border:none;display:block;}
+
+/* ═══ CONTACT ═══ */
+#contact{background:linear-gradient(135deg,rgba(139,92,246,0.05),rgba(6,182,212,0.03));border-top:1px solid var(--border);}
+.contact-inner{max-width:740px;margin:0 auto;text-align:center;}
+.contact-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:36px;}
+.contact-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:26px 18px;text-align:center;text-decoration:none;transition:all .3s;display:block;}
+.contact-card:hover{transform:translateY(-5px);border-color:var(--border2);box-shadow:0 16px 40px rgba(139,92,246,0.15);}
+.contact-card-icon{font-size:1.8rem;margin-bottom:10px;display:block;}
+.contact-card-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;}
+.contact-card-value{font-size:13px;font-weight:600;color:var(--white);}
+
+/* ═══ FOOTER ═══ */
+footer{padding:28px 5%;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.footer-logo{display:flex;align-items:center;gap:8px;text-decoration:none;}
+.footer-logo-icon{width:28px;height:28px;background:linear-gradient(135deg,var(--accent),var(--cyan));border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:10px;color:white;}
+.footer-copy{font-size:12px;color:var(--muted);}
+.footer-links{display:flex;gap:18px;}
+.footer-links a{font-size:12px;color:var(--muted);text-decoration:none;transition:color .2s;}
+.footer-links a:hover{color:var(--accent2);}
+
+/* ═══ MODAL ═══ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(8px);}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:24px;max-width:700px;width:100%;max-height:90vh;overflow-y:auto;transform:scale(.95) translateY(20px);transition:transform .35s cubic-bezier(.16,1,.3,1);}
+.modal-overlay.open .modal{transform:scale(1) translateY(0);}
+.modal::-webkit-scrollbar{width:3px;}
+.modal::-webkit-scrollbar-thumb{background:var(--border2);}
+.modal-header{padding:28px 28px 0;display:flex;align-items:flex-start;justify-content:space-between;}
+.modal-header h2{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--white);}
+.modal-close{background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:8px;color:var(--muted);width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .2s;flex-shrink:0;}
+.modal-close:hover{background:rgba(239,68,68,0.15);color:#ef4444;border-color:rgba(239,68,68,0.3);}
+.modal-body{padding:20px 28px 28px;}
+.modal-preview{border-radius:16px;overflow:hidden;border:1px solid var(--border);margin-bottom:22px;}
+.modal-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+.modal-tag{background:rgba(139,92,246,0.1);border:1px solid var(--border2);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--accent2);}
+.modal-desc{color:var(--muted);font-size:14px;line-height:1.75;margin-bottom:20px;}
+.modal-features{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px;}
+.modal-feature{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:13px;color:#94A3B8;display:flex;align-items:center;gap:8px;}
+.modal-feature::before{content:'✓';color:var(--green);font-weight:700;}
+.modal-cta{width:100%;background:linear-gradient(135deg,var(--accent),#4F46E5);color:white;padding:13px;border-radius:12px;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;box-shadow:0 4px 20px rgba(139,92,246,0.4);}
+.modal-cta:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(139,92,246,0.5);}
+
+/* MODAL MOCKUPS */
+.full-mock-site{background:linear-gradient(135deg,#040810,#080f1e);padding:16px;border-radius:0;height:280px;display:flex;flex-direction:column;gap:10px;}
+.fms-nav{height:24px;background:rgba(255,255,255,0.04);border-radius:6px;display:flex;align-items:center;padding:0 10px;gap:8px;}
+.fms-dot{width:6px;height:6px;border-radius:50%;}
+.fms-hero{flex:1;background:linear-gradient(135deg,rgba(139,92,246,0.12),rgba(6,182,212,0.06));border-radius:10px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;}
+.fms-h1{height:10px;background:rgba(255,255,255,0.25);border-radius:5px;width:55%;}
+.fms-sub{height:6px;background:rgba(255,255,255,0.1);border-radius:3px;width:38%;}
+.fms-btn{height:20px;background:linear-gradient(135deg,var(--accent),#4F46E5);border-radius:8px;width:22%;margin-top:4px;}
+
+.full-mock-video{background:#000;height:280px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.full-mock-video::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 60%,rgba(139,92,246,0.25),transparent 60%),radial-gradient(circle at 70% 30%,rgba(6,182,212,0.15),transparent 50%);}
+.fmv-play{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.12);border:2px solid rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;font-size:26px;z-index:1;animation:playPulse 2s ease-in-out infinite;}
+.fmv-bar{position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(to top,rgba(0,0,0,0.8),transparent);display:flex;align-items:center;padding:0 16px;gap:8px;}
+.fmv-progress{flex:1;height:3px;background:rgba(255,255,255,0.15);border-radius:2px;overflow:hidden;}
+.fmv-progress-fill{width:35%;height:100%;background:linear-gradient(90deg,var(--accent),var(--cyan));}
+
+.full-mock-agent{background:linear-gradient(135deg,#060610,#0a0620);height:280px;padding:16px;display:flex;flex-direction:column;gap:8px;overflow:hidden;}
+.fma-header{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.fma-avatar{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--cyan));}
+.fma-name{font-size:11px;color:white;font-weight:600;}
+.fma-dot{width:5px;height:5px;border-radius:50%;background:var(--green);margin-left:auto;}
+.fma-msg{border-radius:10px;padding:8px 11px;font-size:10px;line-height:1.4;max-width:78%;}
+.fma-msg.ai{background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.15);color:#A78BFA;align-self:flex-start;}
+.fma-msg.user{background:linear-gradient(135deg,#5B21B6,#4338CA);color:rgba(255,255,255,0.9);align-self:flex-end;}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:900px){
+  .services-grid{grid-template-columns:1fr;}
+  .portfolio-grid{grid-template-columns:1fr 1fr;}
+  #pourquoi{grid-template-columns:1fr;}
+  .apropos-inner{grid-template-columns:1fr;text-align:center;}
+  .apropos-avatar{margin:0 auto;}
+  .apropos-tags{justify-content:center;}
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .stat-item:nth-child(2){border-right:none;}
+  .stat-item:nth-child(3){border-top:1px solid var(--border);}
+  .stat-item:nth-child(4){border-top:1px solid var(--border);border-right:none;}
+  .contact-cards{grid-template-columns:1fr;}
+  .modal-features{grid-template-columns:1fr;}
+  footer{flex-direction:column;gap:14px;text-align:center;}
+}
+@media(max-width:600px){.portfolio-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-icon">MK</div>
+    <span class="nav-logo-text">MK Lab</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#portfolio">Exemples</a></li>
+    <li><a href="#pourquoi">Pourquoi nous</a></li>
+    <li><a href="#apropos">À propos</a></li>
+    <li><a href="#demos">Démos IA</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="rdv.html" class="nav-cta" target="_blank">📅 Prendre un RDV</a>
+  <button class="nav-mobile-btn" onclick="toggleMenu()">☰</button>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div id="particles"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <div class="hero-badge"><span class="hero-badge-dot"></span>Agence IA & Digital — Disponible maintenant</div>
+  <h1 class="hero-title">On transforme vos idées<br>en <span class="grad">résultats concrets</span></h1>
+  <p class="hero-sub">Sites web, vidéos pub IA, agents intelligents — MK Lab donne à votre business une présence digitale qui impressionne et qui convertit.</p>
+  <div class="hero-btns">
+    <a href="#services" class="btn-primary">Découvrir les services →</a>
+    <a href="#portfolio" class="btn-secondary">Voir des exemples</a>
+  </div>
+  <div class="hero-scroll"><div class="hero-scroll-line"></div><span>Défiler</span></div>
+</section>
+
+<!-- STATS -->
+<div id="stats">
+  <div class="stats-grid">
+    <div class="stat-item reveal"><div class="stat-num" data-target="4">0</div><div class="stat-label">Services disponibles</div></div>
+    <div class="stat-item reveal reveal-delay-1"><div class="stat-num">48h</div><div class="stat-label">Délai de réponse</div></div>
+    <div class="stat-item reveal reveal-delay-2"><div class="stat-num">100%</div><div class="stat-label">Sur mesure</div></div>
+    <div class="stat-item reveal reveal-delay-3"><div class="stat-num" style="font-size:1.6rem">IA</div><div class="stat-label">Dans chaque projet</div></div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="services-header reveal">
+    <div class="section-label">Ce qu'on fait</div>
+    <h2 class="section-title">Des services qui <span class="grad">propulsent</span> votre business</h2>
+  </div>
+  <div class="services-grid">
+    <div class="service-card reveal" onclick="openModal('site')">
+      <span class="service-icon">🌐</span>
+      <div class="service-name">Site Web Professionnel</div>
+      <p class="service-desc">Un site rapide, moderne et optimisé qui donne envie aux visiteurs de rester — et de vous contacter.</p>
+      <ul class="service-features">
+        <li>Design sur mesure, unique</li><li>Optimisé mobile & SEO</li><li>Livraison rapide</li><li>Modifications incluses</li>
+      </ul>
+      <div><span class="service-price">400€ — 800€</span><div class="service-price-sub">selon complexité</div></div>
+      <div class="service-see-more">Voir un exemple →</div>
+    </div>
+    <div class="service-card featured reveal reveal-delay-1" onclick="openModal('video')">
+      <div class="featured-tag">⭐ Populaire</div>
+      <span class="service-icon">🎬</span>
+      <div class="service-name">Vidéo Pub avec l'IA</div>
+      <p class="service-desc">Des vidéos publicitaires percutantes créées avec l'IA — qualité cinéma pour un prix accessible.</p>
+      <ul class="service-features">
+        <li>Script + voix off IA</li><li>Visuels générés par IA</li><li>Montage professionnel</li><li>Format réseaux sociaux</li>
+      </ul>
+      <div><span class="service-price">300€ — 600€</span><div class="service-price-sub">selon durée & complexité</div></div>
+      <div class="service-see-more">Voir un exemple →</div>
+    </div>
+    <div class="service-card reveal reveal-delay-2" onclick="openModal('agent')">
+      <span class="service-icon">🤖</span>
+      <div class="service-name">Agent IA Personnalisé</div>
+      <p class="service-desc">Un assistant IA taillé pour votre business — répond à vos clients 24h/24, prend des RDV, qualifie les prospects.</p>
+      <ul class="service-features">
+        <li>Entraîné sur votre contenu</li><li>Intégré à votre site</li><li>Système de prise de RDV</li><li>Mise à jour incluse</li>
+      </ul>
+      <div><span class="service-price">300€ — 500€</span><div class="service-price-sub">selon fonctionnalités</div></div>
+      <div class="service-see-more">Voir un exemple →</div>
+    </div>
+    <div class="service-card featured reveal reveal-delay-3" onclick="openModal('pack')">
+      <div class="featured-tag">🔥 Meilleure valeur</div>
+      <span class="service-icon">⚡</span>
+      <div class="service-name">Pack Complet MK Lab</div>
+      <p class="service-desc">Site web + vidéo pub + agent IA. Tout pour une présence digitale complète et professionnelle.</p>
+      <ul class="service-features">
+        <li>Les 3 services inclus</li><li>Priorité sur les délais</li><li>Support dédié 1 mois</li><li>Économisez jusqu'à 400€</li>
+      </ul>
+      <div><span class="service-price">1000€ — 2000€</span><div class="service-price-sub">tout inclus, sans surprise</div></div>
+      <div class="service-see-more">Découvrir le pack →</div>
+    </div>
+  </div>
+</section>
+
+<!-- PORTFOLIO -->
+<section id="portfolio">
+  <div class="portfolio-header reveal">
+    <div class="section-label">Exemples & réalisations</div>
+    <h2 class="section-title">Ce qu'on peut <span class="grad">créer pour vous</span></h2>
+    <p class="section-sub" style="margin:0 auto;text-align:center;">Cliquez sur un projet pour voir les détails et comprendre exactement ce que vous obtenez.</p>
+  </div>
+  <div class="portfolio-grid">
+    <div class="portfolio-card reveal" onclick="openModal('site')">
+      <div class="portfolio-preview">
+        <div class="mock-site">
+          <div class="mock-bar"></div>
+          <div class="mock-hero"><div class="mock-hero-title"></div><div class="mock-hero-sub"></div><div class="mock-hero-btn"></div></div>
+        </div>
+        <div class="portfolio-overlay"><button class="portfolio-overlay-btn">Voir le détail →</button></div>
+      </div>
+      <div class="portfolio-info">
+        <div class="portfolio-tag">Site Web</div>
+        <div class="portfolio-title">Site vitrine business</div>
+        <div class="portfolio-desc">Design moderne, dark premium, entièrement sur mesure.</div>
+      </div>
+    </div>
+    <div class="portfolio-card reveal reveal-delay-1" onclick="openModal('video')">
+      <div class="portfolio-preview">
+        <div class="mock-video">
+          <div class="mock-play">▶</div>
+          <div class="mock-video-lines"><div class="mock-vline active"></div><div class="mock-vline"></div></div>
+        </div>
+        <div class="portfolio-overlay"><button class="portfolio-overlay-btn">Voir le détail →</button></div>
+      </div>
+      <div class="portfolio-info">
+        <div class="portfolio-tag">Vidéo IA</div>
+        <div class="portfolio-title">Pub produit / service</div>
+        <div class="portfolio-desc">Vidéo 30–60s, narration IA, visuels cinématiques.</div>
+      </div>
+    </div>
+    <div class="portfolio-card reveal reveal-delay-2" onclick="openModal('agent')">
+      <div class="portfolio-preview">
+        <div class="mock-agent">
+          <div class="fma-header"><div class="fma-avatar"></div><div class="fma-name">Agent IA</div><div class="fma-dot"></div></div>
+          <div class="fma-msg ai">Bonjour ! Comment puis-je vous aider ? 👋</div>
+          <div class="fma-msg user">Quels sont vos tarifs ?</div>
+          <div class="fma-msg ai">Nos offres commencent à 400€ pour un site web...</div>
+          <div class="fma-msg user">Je veux prendre un RDV</div>
+        </div>
+        <div class="portfolio-overlay"><button class="portfolio-overlay-btn">Voir le détail →</button></div>
+      </div>
+      <div class="portfolio-info">
+        <div class="portfolio-tag">Agent IA</div>
+        <div class="portfolio-title">Assistant commercial IA</div>
+        <div class="portfolio-desc">Répond, qualifie et réserve des RDV automatiquement.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- POURQUOI -->
+<section id="pourquoi">
+  <div class="reveal">
+    <div class="section-label">Pourquoi nous</div>
+    <h2 class="section-title">Pas une agence<br>comme les <span class="grad">autres</span></h2>
+    <p class="section-sub">Pas de grands discours, pas de frais cachés. Du travail sérieux, des résultats réels, et quelqu'un qui répond.</p>
+  </div>
+  <div class="trust-cards">
+    <div class="trust-card reveal">
+      <div class="trust-icon t-purple">🎯</div>
+      <div><h3>100% personnalisé</h3><p>Chaque projet est unique. On ne vend pas de templates copiés-collés — on crée ce qui correspond exactement à votre vision.</p></div>
+    </div>
+    <div class="trust-card reveal reveal-delay-1">
+      <div class="trust-icon t-cyan">⚡</div>
+      <div><h3>L'IA au service de votre business</h3><p>On utilise les outils les plus avancés pour livrer un travail de qualité professionnelle, plus vite et moins cher qu'une grande agence.</p></div>
+    </div>
+    <div class="trust-card reveal reveal-delay-2">
+      <div class="trust-icon t-green">🤝</div>
+      <div><h3>Transparence totale</h3><p>Prix clairs dès le départ. Vous savez exactement ce que vous payez, quand vous le recevez. Aucune mauvaise surprise.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- À PROPOS -->
+<section id="apropos">
+  <div class="apropos-inner">
+    <div class="apropos-avatar reveal">MK</div>
+    <div class="reveal">
+      <div class="section-label">Qui suis-je</div>
+      <p class="apropos-quote">Je crois que chaque business mérite une présence digitale qui lui ressemble vraiment — et l'IA rend ça possible aujourd'hui.</p>
+      <p style="color:var(--muted);font-size:13.5px;line-height:1.75;margin-bottom:20px;">MK Lab c'est l'agence que j'ai créée pour aider les entrepreneurs à se démarquer en ligne avec des outils modernes. Chaque projet est traité avec sérieux, passion et une vraie volonté de résultats.</p>
+      <div class="apropos-tags">
+        <span class="tag">🇫🇷 Basé en France</span>
+        <span class="tag">🤖 Spécialiste IA</span>
+        <span class="tag">🎬 Vidéo & Motion</span>
+        <span class="tag">💻 Développement Web</span>
+        <span class="tag">🚀 Résultats concrets</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MKIA LIVE -->
+<section id="mkia-section">
+  <div class="mkia-header reveal">
+    <div class="section-label">Testez maintenant</div>
+    <h2 class="section-title">Parlez à <span class="grad">MKIA</span>, mon agent IA</h2>
+    <p class="section-sub" style="margin:0 auto 36px;text-align:center;">Posez vos questions, demandez un devis, prenez un RDV — directement ici, en live.</p>
+  </div>
+  <div class="mkia-wrapper reveal" style="display:flex;align-items:center;justify-content:center;padding:0 5%;">
+    <div style="width:100%;max-width:520px;background:#0D1117;border:1px solid rgba(139,92,246,0.3);border-radius:20px;overflow:hidden;box-shadow:0 30px 80px rgba(139,92,246,0.2);">
+      <!-- Chat header -->
+      <div style="background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(6,182,212,0.1));border-bottom:1px solid rgba(139,92,246,0.2);padding:16px 20px;display:flex;align-items:center;gap:12px;">
+        <div style="width:38px;height:38px;background:linear-gradient(135deg,#8B5CF6,#06B6D4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;">🤖</div>
+        <div><div style="font-weight:700;color:#fff;font-size:14px;">MKIA — Agent MK Lab</div><div style="font-size:11px;color:#10B981;display:flex;align-items:center;gap:5px;"><span style="width:6px;height:6px;background:#10B981;border-radius:50%;display:inline-block;animation:breathe 2s infinite;"></span>En ligne</div></div>
+      </div>
+      <!-- Messages -->
+      <div style="padding:20px;display:flex;flex-direction:column;gap:14px;min-height:280px;">
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <div style="width:28px;height:28px;background:linear-gradient(135deg,#8B5CF6,#06B6D4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">🤖</div>
+          <div style="background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.2);border-radius:14px;border-top-left-radius:4px;padding:11px 14px;font-size:13.5px;color:#E2E8F0;max-width:80%;line-height:1.55;animation:fadeUp .5s .2s both;">Bonjour ! 👋 Je suis MKIA, l'agent de MK Lab.<br>Vous cherchez un site, un agent IA ou une vidéo pub ?</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;flex-direction:row-reverse;">
+          <div style="width:28px;height:28px;background:#1E293B;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">👤</div>
+          <div style="background:#1E293B;border:1px solid #2D3748;border-radius:14px;border-top-right-radius:4px;padding:11px 14px;font-size:13.5px;color:#E2E8F0;max-width:80%;line-height:1.55;animation:fadeUp .5s .6s both;">Je veux un agent IA pour mon restaurant, c'est combien ?</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <div style="width:28px;height:28px;background:linear-gradient(135deg,#8B5CF6,#06B6D4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">🤖</div>
+          <div style="background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.2);border-radius:14px;border-top-left-radius:4px;padding:11px 14px;font-size:13.5px;color:#E2E8F0;max-width:85%;line-height:1.55;animation:fadeUp .5s 1s both;">Super choix ! 🍽️ Pour un agent réservation restaurant, on est généralement entre <strong style="color:#A78BFA;">400€ et 800€</strong> selon les fonctionnalités. Vous avez déjà un site web ?</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;flex-direction:row-reverse;">
+          <div style="width:28px;height:28px;background:#1E293B;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">👤</div>
+          <div style="background:#1E293B;border:1px solid #2D3748;border-radius:14px;border-top-right-radius:4px;padding:11px 14px;font-size:13.5px;color:#E2E8F0;max-width:80%;animation:fadeUp .5s 1.4s both;">Non, pas encore de site.</div>
+        </div>
+      </div>
+      <!-- CTA -->
+      <div style="padding:16px 20px;border-top:1px solid rgba(139,92,246,0.15);background:rgba(139,92,246,0.05);">
+        <a href="demos/index.html" style="display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#8B5CF6,#4F46E5);color:white;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;text-decoration:none;transition:.2s;box-shadow:0 4px 20px rgba(139,92,246,0.35);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">🚀 Tester les vrais agents en live →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DÉMOS AGENTS IA -->
+<section id="demos" style="padding:80px 5%;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="section-label reveal">Agents en live</div>
+    <h2 class="section-title reveal">Nos démos <span class="grad">interactives</span></h2>
+    <p class="section-sub reveal" style="margin:0 auto 14px;text-align:center;">Chaque agent est réel — cliquez, parlez, prenez RDV. C'est exactement ce que vous auriez pour votre business.</p>
+    <!-- Stats rapides -->
+    <div class="reveal" style="display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;margin:20px 0 32px;">
+      <div style="text-align:center;background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.2);border-radius:12px;padding:12px 24px;">
+        <div style="font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:#A78BFA;">5</div>
+        <div style="font-size:11px;color:#64748B;text-transform:uppercase;letter-spacing:1px;">Secteurs</div>
+      </div>
+      <div style="text-align:center;background:rgba(6,182,212,0.06);border:1px solid rgba(6,182,212,0.2);border-radius:12px;padding:12px 24px;">
+        <div style="font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:#06B6D4;">5</div>
+        <div style="font-size:11px;color:#64748B;text-transform:uppercase;letter-spacing:1px;">Dashboards</div>
+      </div>
+      <div style="text-align:center;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:12px;padding:12px 24px;">
+        <div style="font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:#10B981;">60s</div>
+        <div style="font-size:11px;color:#64748B;text-transform:uppercase;letter-spacing:1px;">Pour réserver</div>
+      </div>
+      <div style="text-align:center;background:rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.2);border-radius:12px;padding:12px 24px;">
+        <div style="font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:#F97316;">IA</div>
+        <div style="font-size:11px;color:#64748B;text-transform:uppercase;letter-spacing:1px;">Groq intégré</div>
+      </div>
+    </div>
+    <!-- Grand bouton vitrine -->
+    <div class="reveal" style="text-align:center;margin-bottom:40px;">
+      <a href="demos/index.html" style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(6,182,212,0.1));border:1px solid rgba(139,92,246,0.4);color:#A78BFA;padding:13px 28px;border-radius:40px;font-size:15px;font-weight:600;text-decoration:none;transition:.2s;" onmouseover="this.style.background='rgba(139,92,246,0.25)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='linear-gradient(135deg,rgba(139,92,246,0.15),rgba(6,182,212,0.1))';this.style.transform='translateY(0)'">
+        🎯 Voir la page démos complète avec agents + dashboards →
+      </a>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.2rem;">
+
+      <a href="demos/coiffeur/index.html" target="_blank" style="text-decoration:none;display:block;background:#161B22;border:1px solid #21262D;border-radius:14px;overflow:hidden;transition:.2s;" onmouseover="this.style.borderColor='rgba(139,92,246,0.5)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='#21262D';this.style.transform='translateY(0)'">
+        <div style="height:130px;background:linear-gradient(135deg,#2a1a0a,#3d2510);display:flex;align-items:center;justify-content:center;font-size:4rem;position:relative;">
+          💇‍♀️
+          <div style="position:absolute;top:0.6rem;right:0.6rem;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);border-radius:20px;padding:0.2rem 0.5rem;font-size:0.68rem;color:#22c55e;display:flex;align-items:center;gap:0.25rem;"><span style="width:5px;height:5px;border-radius:50%;background:#22c55e;display:inline-block;"></span>Agent actif</div>
+        </div>
+        <div style="padding:1rem 1.2rem;">
+          <div style="font-size:0.7rem;color:var(--accent2);text-transform:uppercase;letter-spacing:2px;margin-bottom:0.3rem;">Beauté · Coiffure</div>
+          <div style="font-weight:700;color:#fff;margin-bottom:0.4rem;">Salon Élégance</div>
+          <div style="color:var(--muted);font-size:0.82rem;">Lisa prend votre RDV en 60s — prestation, créneau, confirmation.</div>
+          <div style="margin-top:0.7rem;display:flex;gap:0.4rem;flex-wrap:wrap;"><span style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:10px;padding:0.15rem 0.5rem;font-size:0.7rem;color:rgba(139,92,246,0.9);">Booking conversationnel</span><span style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:10px;padding:0.15rem 0.5rem;font-size:0.7rem;color:rgba(139,92,246,0.9);">IA Groq</span></div>
+        </div>
+      </a>
+
+      <a href="demos/restaurant/index.html" target="_blank" style="text-decoration:none;display:block;background:#161B22;border:1px solid #21262D;border-radius:14px;overflow:hidden;transition:.2s;" onmouseover="this.style.borderColor='rgba(139,92,246,0.5)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='#21262D';this.style.transform='translateY(0)'">
+        <div style="height:130px;background:linear-gradient(135deg,#1a0505,#3a1010);display:flex;align-items:center;justify-content:center;font-size:4rem;position:relative;">
+          🍽️
+          <div style="position:absolute;top:0.6rem;right:0.6rem;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);border-radius:20px;padding:0.2rem 0.5rem;font-size:0.68rem;color:#22c55e;display:flex;align-items:center;gap:0.25rem;"><span style="width:5px;height:5px;border-radius:50%;background:#22c55e;display:inline-block;"></span>Agent actif</div>
+        </div>
+        <div style="padding:1rem 1.2rem;">
+          <div style="font-size:0.7rem;color:var(--accent2);text-transform:uppercase;letter-spacing:2px;margin-bottom:0.3rem;">Restauration</div>
+          <div style="font-weight:700;color:#fff;margin-bottom:0.4rem;">Le Bistrot du Chef</div>
+          <div style="color:var(--muted);font-size:0.82rem;">Théo gère réservations, tables complètes et propose des alternatives.</div>
+          <div style="margin-top:0.7rem;display:flex;gap:0.4rem;flex-wrap:wrap;"><span style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:10px;padding:0.15rem 0.5rem;font-size:0.7rem;color:rgba(139,92,246,0.9);">Réservation table</span><span style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:10px;padding:0.15rem 0.5rem;font-size:0.7rem;color:rgba(139,92,246,0.9);">Plan de salle live</span></div>
+        </div>
+      </a>
+
+      <a href="demos/coach/index.html" target="_blank" style="text-decoration:none;display:block;background:#161B22;border:1px solid #21262D;border-radius:14px;overflow:hidden;transition:.2s;" onmouseover="this.style.borderColor='rgba(139,92,246,0.5)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='#21262D';this.style.transform='translateY(0)'">
+        <div style="height:130px;background:linear-gradient(135deg,#1a0f00,#2a1500);display:flex;align-items:center;justify-content:center;font-size:4rem;position:relative;">
+          🏋️
+          <div style="position:absolute;top:0.6rem;right:0.6rem;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);border-radius:20px;padding:0.2rem 0.5rem;font-size:0.68rem;color:#22c55e;display:flex;align-items:center;gap:0.25rem;"><span style="width:5px;height:5px;border-radius:50%;background:#22c55e;display:inline-block;"></span>Agent actif</div>
+        </div>
+        <div style="padding:1rem 1.2rem;">
+          <div style="font-size:0.7rem;color:var(--accent2);text-transform:uppercase;letter-spacing:2px;margin-bottom:0.3rem;">Sport · Coaching</div>
+          <div style="font-weight:700;color:#fff;margin-bottom:0.4rem;">Alex Performance</div>
+          <div style="color:var(--muted);font-size:0.82rem;">3 questions → programme recommandé → objection gérée → séance réservée.</div>
+          <div style="margin-top:0.7rem;display:flex;gap:0.4rem;flex-wrap:wrap;"><span style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:10px;padding:0.15rem 0.5rem;font-size:0.7rem;color:rgba(139,92,246,0.9);">Qualification</span><span style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:10px;padding:0.15rem 0.5rem;font-size:0.7rem;color:rgba(139,92,246,0.9);">Anti-objection</span></div>
+        </div>
+      </a>
+
+      <a href="demos/esthetique/index.html" target="_blank" style="text-decoration:none;display:block;background:#161B22;border:1px solid #21262D;border-radius:14px;overflow:hidden;transition:.2s;" onmouseover="this.style.borderColor='rgba(139,92,246,0.5)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='#21262D';this.style.transform='translateY(0)'">
+        <div style="height:130px;background:linear-gradient(135deg,#0a1a0a,#1a2e1a);display:flex;align-items:center;justify-content:center;font-size:4rem;position:relative;">
+          🌸
+          <div style="position:absolute;top:0.6rem;right:0.6rem;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);border-radius:20px;padding:0.2rem 0.5rem;font-size:0.68rem;color:#22c55e;display:flex;align-items:center;gap:0.25rem;"><span style="width:5px;height:5px;border-radius:50%;background:#22c55e;display:inline-block;"></span>Agent actif</div>
+        </div>
+        <div style="padding:1rem 1.2rem;">
+          <div style="font-size:0.7rem;color:var(--accent2);text-transform:uppercase;letter-spacing:2px;margin-bottom:0.3rem;">Beauté · Bien-être</div>
+          <div style="font-weight:700;color:#fff;margin-bottom:0.4rem;">Institut Sérénité</div>
+          <div style="color:var(--muted);font-size:0.82rem;">Jade diagnostique votre peau en 2 questions et recommande le soin idéal.</div>
+          <div style="margin-top:0.7rem;display:flex;gap:0.4rem;flex-wrap:wrap;"><span style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:10px;padding:0.15rem 0.5rem;font-size:0.7rem;color:rgba(139,92,246,0.9);">Diagnostic IA</span><span style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:10px;padding:0.15rem 0.5rem;font-size:0.7rem;color:rgba(139,92,246,0.9);">Recommandation</span></div>
+        </div>
+      </a>
+
+      <a href="demos/immobilier/index.html" target="_blank" style="text-decoration:none;display:block;background:#161B22;border:1px solid #21262D;border-radius:14px;overflow:hidden;transition:.2s;" onmouseover="this.style.borderColor='rgba(139,92,246,0.5)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='#21262D';this.style.transform='translateY(0)'">
+        <div style="height:130px;background:linear-gradient(135deg,#0a1020,#1a2a40);display:flex;align-items:center;justify-content:center;font-size:4rem;position:relative;">
+          🏠
+          <div style="position:absolute;top:0.6rem;right:0.6rem;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);border-radius:20px;padding:0.2rem 0.5rem;font-size:0.68rem;color:#22c55e;display:flex;align-items:center;gap:0.25rem;"><span style="width:5px;height:5px;border-radius:50%;background:#22c55e;display:inline-block;"></span>Agent actif</div>
+        </div>
+        <div style="padding:1rem 1.2rem;">
+          <div style="font-size:0.7rem;color:var(--accent2);text-transform:uppercase;letter-spacing:2px;margin-bottom:0.3rem;">Immobilier</div>
+          <div style="font-weight:700;color:#fff;margin-bottom:0.4rem;">Immo Prestige</div>
+          <div style="color:var(--muted);font-size:0.82rem;">Marc qualifie achat/vente/invest et collecte les contacts même si le client hésite.</div>
+          <div style="margin-top:0.7rem;display:flex;gap:0.4rem;flex-wrap:wrap;"><span style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:10px;padding:0.15rem 0.5rem;font-size:0.7rem;color:rgba(139,92,246,0.9);">Multi-flux</span><span style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:10px;padding:0.15rem 0.5rem;font-size:0.7rem;color:rgba(139,92,246,0.9);">Pipeline leads</span></div>
+        </div>
+      </a>
+
+      <div style="background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(6,182,212,0.05));border:1px dashed rgba(139,92,246,0.3);border-radius:14px;display:flex;align-items:center;justify-content:center;min-height:250px;cursor:pointer;" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
+        <div style="text-align:center;padding:1.5rem;">
+          <div style="font-size:2.5rem;margin-bottom:0.8rem;">➕</div>
+          <div style="font-weight:700;color:#fff;margin-bottom:0.5rem;">Votre business</div>
+          <div style="color:var(--muted);font-size:0.82rem;margin-bottom:1rem;">Dentiste, avocat, e-commerce, salon...<br>MK Lab s'adapte à tout secteur.</div>
+          <div style="background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);border-radius:20px;padding:0.4rem 1rem;font-size:0.8rem;color:var(--accent2);display:inline-block;">Nous contacter →</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner reveal">
+    <div class="section-label">On travaille ensemble ?</div>
+    <h2 class="section-title">Prêt à <span class="grad">démarrer</span> votre projet ?</h2>
+    <p class="section-sub" style="margin:0 auto 8px;text-align:center;">Parlez-moi de votre projet et je vous reviens sous 24h avec une proposition sur mesure.</p>
+    <div class="contact-cards">
+      <a href="demos/index.html" class="contact-card"><span class="contact-card-icon">🤖</span><div class="contact-card-label">Agents IA</div><div class="contact-card-value">Tester les démos</div></a>
+      <a href="mailto:mickaelkouiras0@gmail.com" class="contact-card"><span class="contact-card-icon">📧</span><div class="contact-card-label">Email direct</div><div class="contact-card-value">mickaelkouiras0@gmail.com</div></a>
+      <a href="mailto:mickaelkouiras0@gmail.com?subject=Demande%20de%20devis%20MK%20Lab&body=Bonjour%20Mickael,%0A%0AJe%20souhaite%20discuter%20d'un%20projet%20avec%20MK%20Lab.%0A%0AType%20de%20business%20:%20%0ABesoin%20:%20%0A%0AMerci%20!" class="contact-card"><span class="contact-card-icon">📅</span><div class="contact-card-label">Devis rapide</div><div class="contact-card-value">Envoyer ma demande</div></a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" class="footer-logo"><div class="footer-logo-icon">MK</div><span style="font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:var(--white);margin-left:6px;">MK Lab</span></a>
+  <span class="footer-copy">© 2026 MK Lab — Tous droits réservés</span>
+  <div class="footer-links"><a href="#services">Services</a><a href="#portfolio">Exemples</a><a href="#demos">Démos</a><a href="#contact">Contact</a><a href="demos/index.html">Agents IA</a></div>
+</footer>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal" onclick="closeModalOnBg(event)">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<script>
+/* ── NAVBAR ── */
+window.addEventListener('scroll',function(){
+  document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>40);
+});
+
+/* ── REVEAL ON SCROLL ── */
+var io = new IntersectionObserver(function(entries){
+  entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('visible'); });
+},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+
+/* ── COUNTER ANIMATION ── */
+var counted = false;
+var statsObserver = new IntersectionObserver(function(entries){
+  if(entries[0].isIntersecting && !counted){
+    counted = true;
+    document.querySelectorAll('[data-target]').forEach(function(el){
+      var target = parseInt(el.dataset.target);
+      var current = 0;
+      var step = target/30;
+      var timer = setInterval(function(){
+        current = Math.min(current+step, target);
+        el.textContent = Math.floor(current);
+        if(current >= target) clearInterval(timer);
+      }, 40);
+    });
+  }
+},{threshold:.5});
+var statsEl = document.getElementById('stats');
+if(statsEl) statsObserver.observe(statsEl);
+
+/* ── FLOATING PARTICLES ── */
+(function(){
+  var canvas = document.createElement('canvas');
+  canvas.style.cssText='position:absolute;inset:0;pointer-events:none;';
+  var hero = document.getElementById('hero');
+  hero.insertBefore(canvas,hero.firstChild);
+  var ctx = canvas.getContext('2d');
+  var particles = [];
+  function resize(){ canvas.width=hero.offsetWidth; canvas.height=hero.offsetHeight; }
+  resize(); window.addEventListener('resize',resize);
+  for(var i=0;i<60;i++){
+    particles.push({
+      x:Math.random()*canvas.width, y:Math.random()*canvas.height,
+      r:Math.random()*1.5+.5, vx:(Math.random()-.5)*.3, vy:(Math.random()-.5)*.3,
+      o:Math.random()*.5+.1
+    });
+  }
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(function(p){
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0||p.x>canvas.width) p.vx*=-1;
+      if(p.y<0||p.y>canvas.height) p.vy*=-1;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(167,139,250,'+p.o+')';
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── 3D TILT ── */
+document.querySelectorAll('.service-card').forEach(function(card){
+  card.addEventListener('mousemove',function(e){
+    var rect = card.getBoundingClientRect();
+    var x = (e.clientX-rect.left)/rect.width-.5;
+    var y = (e.clientY-rect.top)/rect.height-.5;
+    card.style.transform='translateY(-8px) scale(1.01) rotateX('+(y*-6)+'deg) rotateY('+(x*6)+'deg)';
+    card.style.transition='transform .05s';
+  });
+  card.addEventListener('mouseleave',function(){
+    card.style.transform='';
+    card.style.transition='all .4s cubic-bezier(.16,1,.3,1)';
+  });
+});
+
+/* ── SMOOTH NAV ── */
+document.querySelectorAll('a[href^="#"]').forEach(function(a){
+  a.addEventListener('click',function(e){
+    var t=document.querySelector(this.getAttribute('href'));
+    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});}
+  });
+});
+
+/* ── MOBILE MENU ── */
+function toggleMenu(){
+  var l=document.querySelector('.nav-links');
+  if(!l) return;
+  var open=l.style.display==='flex';
+  l.style.cssText=open?'':'display:flex;flex-direction:column;position:fixed;top:68px;left:0;right:0;background:rgba(7,9,15,.97);padding:20px 5%;gap:18px;border-bottom:1px solid rgba(139,92,246,.2);backdrop-filter:blur(20px);z-index:999;';
+}
+
+/* ── MODALS ── */
+var modalData = {
+  site: {
+    title: '🌐 Site Web Professionnel',
+    tags: ['Design sur mesure','Responsive','SEO optimisé','Rapide'],
+    preview: '<div class="full-mock-site"><div class="fms-nav"><div class="fms-dot" style="background:#ef4444"></div><div class="fms-dot" style="background:#f59e0b"></div><div class="fms-dot" style="background:#10b981"></div></div><div class="fms-hero"><div class="fms-h1"></div><div class="fms-sub"></div><div class="fms-btn"></div></div></div>',
+    desc: 'Votre site web est votre vitrine 24h/24. On crée un site qui reflète votre image, convainc vos visiteurs et les pousse à vous contacter. Design moderne, chargement rapide, compatible mobile — tout ce qu\'il faut pour être pris au sérieux en ligne.',
+    features: ['Design unique & personnel','Compatible mobile (responsive)','Optimisé pour Google (SEO)','Formulaire de contact intégré','Hébergement & domaine guidé','Livraison sous 5-10 jours'],
+    price: '400€ — 800€'
+  },
+  video: {
+    title: '🎬 Vidéo Pub avec l\'IA',
+    tags: ['Voix off IA','Visuels cinéma','Format social','Script inclus'],
+    preview: '<div class="full-mock-video"><div class="fmv-play">▶</div><div class="fmv-bar"><div class="fmv-progress"><div class="fmv-progress-fill"></div></div></div></div>',
+    desc: 'Une vidéo pub percutante peut transformer votre business. Avec l\'IA, on crée des visuels de qualité cinématique, une narration professionnelle et un montage accrocheur — pour un budget accessible. Parfait pour Instagram, TikTok, YouTube, ou votre site.',
+    features: ['Script professionnel inclus','Voix off générée par IA','Visuels & animations IA','Montage & effets premium','Format adapté aux réseaux','Durée : 30 à 90 secondes'],
+    price: '300€ — 600€'
+  },
+  agent: {
+    title: '🤖 Agent IA Personnalisé',
+    tags: ['24h/24','Prise de RDV','Sur votre site','Qualifie prospects'],
+    preview: '<div class="full-mock-agent"><div class="fma-header"><div class="fma-avatar"></div><div class="fma-name">Votre agent IA</div><div class="fma-dot"></div></div><div class="fma-msg ai">Bonjour ! Comment puis-je vous aider ? 👋</div><div class="fma-msg user">Quels sont vos services ?</div><div class="fma-msg ai">On propose des sites web, vidéos pub IA, et agents IA sur mesure !</div><div class="fma-msg user">Je veux prendre un RDV</div><div class="fma-msg ai">Parfait ! Voici les créneaux disponibles 👇</div></div>',
+    desc: 'Imaginez un commercial qui répond à vos clients à 3h du matin, ne se trompe jamais, prend les rendez-vous automatiquement et qualifie les prospects — c\'est un agent IA. On le configure avec votre contenu, votre ton, vos services. Vous le testez ici même sur ce site.',
+    features: ['Entraîné sur vos infos','Intégré à votre site web','Prise de RDV automatique','Répond en temps réel','Notification sur votre téléphone','Tableau de bord planning inclus'],
+    price: '300€ — 500€'
+  },
+  pack: {
+    title: '⚡ Pack Complet MK Lab',
+    tags: ['Tout inclus','Meilleure valeur','Support 1 mois','Priorité livraison'],
+    preview: '<div class="full-mock-site"><div class="fms-nav"><div class="fms-dot" style="background:#ef4444"></div><div class="fms-dot" style="background:#f59e0b"></div><div class="fms-dot" style="background:#10b981"></div></div><div class="fms-hero"><div class="fms-h1"></div><div class="fms-sub"></div><div class="fms-btn"></div></div></div>',
+    desc: 'Le pack complet, c\'est les 3 services réunis avec une cohérence totale : votre site web, votre vidéo pub et votre agent IA travaillent ensemble pour attirer, convaincre et convertir vos prospects. C\'est la solution la plus complète — et la plus rentable avec jusqu\'à 400€ d\'économies.',
+    features: ['Site web sur mesure complet','Vidéo pub IA (30-60s)','Agent IA intégré au site','Support dédié pendant 1 mois','Livraison en priorité','Économies jusqu\'à 400€'],
+    price: '1000€ — 2000€'
+  }
+};
+
+function openModal(type){
+  var d = modalData[type];
+  if(!d) return;
+  var featuresHtml = d.features.map(function(f){return '<div class="modal-feature">'+f+'</div>';}).join('');
+  var tagsHtml = d.tags.map(function(t){return '<span class="modal-tag">'+t+'</span>';}).join('');
+  document.getElementById('modal-content').innerHTML =
+    '<div class="modal-header"><h2>'+d.title+'</h2><button class="modal-close" onclick="closeModal()">✕</button></div>'+
+    '<div class="modal-body">'+
+      '<div class="modal-preview">'+d.preview+'</div>'+
+      '<div class="modal-tags">'+tagsHtml+'</div>'+
+      '<p class="modal-desc">'+d.desc+'</p>'+
+      '<div class="modal-features">'+featuresHtml+'</div>'+
+      '<div style="text-align:center;margin-bottom:16px"><span style="font-family:Syne,sans-serif;font-size:1.6rem;font-weight:800;background:linear-gradient(90deg,#A78BFA,#06B6D4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">'+d.price+'</span></div>'+
+      '<button class="modal-cta" onclick="window.open(\'rdv.html\',\'_blank\')">📅 Prendre un RDV pour ce service →</button>'+
+    '</div>';
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow='';
+}
+function closeModalOnBg(e){if(e.target===document.getElementById('modal')) closeModal();}
+document.addEventListener('keydown',function(e){if(e.key==='Escape') closeModal();});
+</script>
+</body>
+</html>

@@ -341,8 +341,8 @@
             (rdv.projet||rdv.project ? '<div class="detail-item detail-full"><div class="detail-label">Projet</div><div class="detail-value" style="color:var(--muted);font-size:12px;margin-top:2px">'+escHtml(rdv.projet||rdv.project)+'</div></div>' : '') +
             '<div class="detail-item detail-full"><div class="detail-label">Notes personnelles</div>' +
               '<textarea class="inline-input" rows="2" placeholder="Tes notes après l\'appel..." onblur="saveField(\''+rdv.id+'\',\'notes\',this.value)">'+escHtml(rdv.notes||'')+'</textarea></div>' +
-           '</div>' +
-         '<div class="rdv-actions">' +
+          '</div>' +
+          '<div class="rdv-actions">' +
             (rdv.tel||rdv.phone ? '<a class="btn btn-call" href="tel:'+escHtml(rdv.tel||rdv.phone)+'">📞 Appeler</a>' : '') +
             '<button class="btn-devis" onclick="openDevis(\''+rdv.id+'\')">📄 Générer devis</button>' +
             (isDone
